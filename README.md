@@ -14,6 +14,13 @@ go.
   najpierw, podwójny klik.
 - **Wyszukiwanie:** zawsze widoczne pole „Szukaj" w prawym górnym rogu paska
   (jak Windows) + natywne rekurencyjne wyszukiwanie Thunara (także `Ctrl+F`).
+- **Motywy:** menu „Theme" w pasku menu — 8 palet (Fluent/Aurora/Porcelain/Cobalt
+  × Ciemny/Jasny) portowanych z Pythonowego Explorera; zmiana na żywo, zapis do
+  kanału `explorer` (`/explorer-theme`). Generowane przez `scripts/gen-themes.py`.
+- **Pliki ukryte:** widoczne domyślnie. **Ikony:** Win11-dark (jasne motywy → Win11).
+- **Terminal:** prawy klik w folderze → „Otwórz w terminalu" uruchamia `konsole`.
+- **Wszystkie dyski:** `scripts/enable-gvfs-drives.sh` (sudo) dopisuje `x-gvfs-show`
+  do wpisów `/mnt/*` w fstab, by pokazały się w „Nośnikach".
 - **Izolacja:** osobny identyfikator aplikacji `eu.mizak.Explorer` i osobny kanał
   ustawień Xfconf `explorer`.
 
