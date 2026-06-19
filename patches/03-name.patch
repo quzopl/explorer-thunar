@@ -1,0 +1,11 @@
+--- thunar/main.c.orig	2026-06-19 22:53:27.151772600 +0200
++++ thunar/main.c	2026-06-19 22:53:35.228590600 +0200
+@@ -54,7 +54,7 @@
+   xfce_textdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR, "UTF-8");
+ 
+   /* setup application name */
+-  g_set_application_name (_("Thunar"));
++  g_set_application_name (_("Explorer"));
+ 
+ #ifdef G_ENABLE_DEBUG
+   /* Do NOT remove this line for now, If something doesn't work,

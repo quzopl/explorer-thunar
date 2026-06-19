@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Explorer
+Comment=Menedżer plików w stylu Windows na silniku Thunar
+Exec=explorer %F
+Icon=system-file-manager
+Terminal=false
+Categories=System;Utility;Core;GTK;FileManager;
+StartupNotify=true
+MimeType=inode/directory;
