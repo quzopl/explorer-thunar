@@ -1,0 +1,11 @@
+--- thunar/thunar-preferences.c.orig	2026-06-19 22:52:39.254205800 +0200
++++ thunar/thunar-preferences.c	2026-06-19 22:52:47.197688800 +0200
+@@ -1413,7 +1413,7 @@
+     return;
+ 
+   /* load the channel */
+-  preferences->channel = xfconf_channel_get ("thunar");
++  preferences->channel = xfconf_channel_get ("explorer");
+ 
+   /* check one of the property to see if there are values */
+   if (!xfconf_channel_has_property (preferences->channel, check_prop))
