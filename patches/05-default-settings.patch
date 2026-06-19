@@ -1,0 +1,29 @@
+--- thunar/thunar-preferences.c.t2	2026-06-19 23:07:15.790153800 +0200
++++ thunar/thunar-preferences.c	2026-06-19 23:07:35.103835300 +0200
+@@ -220,7 +220,7 @@
+   g_param_spec_string ("default-view",
+                        "DefaultView",
+                        NULL,
+-                       "void",
++                       "ThunarIconView",
+                        EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -400,7 +400,7 @@
+                      "LastIconViewZoomLevel",
+                      NULL,
+                      THUNAR_TYPE_ZOOM_LEVEL,
+-                     THUNAR_ZOOM_LEVEL_100_PERCENT,
++                     THUNAR_ZOOM_LEVEL_150_PERCENT,
+                      EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -1005,7 +1005,7 @@
+                      NULL,
+                      NULL,
+                      THUNAR_TYPE_THUMBNAIL_MODE,
+-                     THUNAR_THUMBNAIL_MODE_ONLY_LOCAL,
++                     THUNAR_THUMBNAIL_MODE_ALWAYS,
+                      EXO_PARAM_READWRITE);
+ 
+   /**

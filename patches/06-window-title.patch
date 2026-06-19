@@ -1,0 +1,11 @@
+--- thunar/thunar-window.c.t2	2026-06-19 23:08:55.368616800 +0200
++++ thunar/thunar-window.c	2026-06-19 23:08:59.295354400 +0200
+@@ -5190,7 +5190,7 @@
+   if (G_UNLIKELY (window_title_style == THUNAR_WINDOW_TITLE_STYLE_FOLDER_NAME_WITHOUT_THUNAR_SUFFIX || window_title_style == THUNAR_WINDOW_TITLE_STYLE_FULL_PATH_WITHOUT_THUNAR_SUFFIX))
+     title = g_strdup_printf ("%s", name);
+   else
+-    title = g_strdup_printf ("%s - %s", name, "Thunar");
++    title = g_strdup_printf ("%s - %s", name, "Explorer");
+   gtk_window_set_title (GTK_WINDOW (window), title);
+   g_free (title);
+   g_free (parse_name);
