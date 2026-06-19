@@ -1,0 +1,13 @@
+--- plugins/thunar-uca/uca.xml.in.t4	2026-06-19 23:46:58.704567300 +0200
++++ plugins/thunar-uca/uca.xml.in	2026-06-19 23:47:13.728184800 +0200
+@@ -40,8 +40,8 @@
+     <patterns>*</patterns>
+     <range></range>
+     <name>Open Terminal Here</name>
+-    <command>exo-open --working-directory %f --launch TerminalEmulator</command>
+-    <description>Example for a custom action</description>
++    <command>konsole --workdir %f</command>
++    <description>Otwiera terminal w bieżącym folderze</description>
+     <startup-notify/>
+     <directories/>
+   </action>
