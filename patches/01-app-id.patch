@@ -1,0 +1,11 @@
+--- thunar/thunar-application.c.orig	2026-06-19 22:51:46.789880200 +0200
++++ thunar/thunar-application.c	2026-06-19 22:51:52.859995400 +0200
+@@ -1254,7 +1254,7 @@
+   if (default_app)
+     return THUNAR_APPLICATION (g_object_ref (default_app));
+   else
+-    return g_object_ref_sink (g_object_new (THUNAR_TYPE_APPLICATION, "application-id", "org.xfce.Thunar", NULL));
++    return g_object_ref_sink (g_object_new (THUNAR_TYPE_APPLICATION, "application-id", "eu.mizak.Explorer", NULL));
+ }
+ 
+ 
