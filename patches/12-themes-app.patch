@@ -1,0 +1,111 @@
+--- thunar/thunar-application.c.t5	2026-06-19 23:52:12.647137100 +0200
++++ thunar/thunar-application.c	2026-06-19 23:52:51.757868600 +0200
+@@ -66,6 +66,7 @@
+ #include "thunar/thunar-view.h"
+ 
+ #include <libxfce4ui/libxfce4ui.h>
++#include <xfconf/xfconf.h>
+ 
+ #define ACCEL_MAP_PATH "Thunar/accels.scm"
+ 
+@@ -689,31 +690,65 @@
+ 
+ 
+ 
++/* Explorer: dostawca CSS aktywnego motywu (żywa zmiana w trakcie działania) */
++static GtkCssProvider *explorer_theme_provider = NULL;
++
++void
++thunar_application_apply_theme (const gchar *slug)
++{
++  GtkSettings *settings;
++  gchar       *file;
++  gchar       *full;
++  gboolean     dark;
++
++  if (slug == NULL || *slug == '\0')
++    slug = "fluent-dark";
++
++  /* slug kończący się na "-light" => motyw jasny */
++  dark = (g_str_has_suffix (slug, "-light") == FALSE);
++
++  settings = gtk_settings_get_default ();
++  if (settings != NULL)
++    g_object_set (settings,
++                  "gtk-application-prefer-dark-theme", dark,
++                  "gtk-icon-theme-name", dark ? "Win11-dark" : "Win11",
++                  NULL);
++
++  if (explorer_theme_provider == NULL)
++    {
++      explorer_theme_provider = gtk_css_provider_new ();
++      gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
++                                                 GTK_STYLE_PROVIDER (explorer_theme_provider),
++                                                 GTK_STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
++    }
++
++  file = g_strconcat (slug, ".css", NULL);
++  full = g_build_filename (DATADIR, "explorer", "themes", file, NULL);
++  gtk_css_provider_load_from_path (explorer_theme_provider, full, NULL);
++  g_free (full);
++  g_free (file);
++}
++
++void
++thunar_application_set_theme (const gchar *slug)
++{
++  if (slug == NULL || *slug == '\0')
++    return;
++  xfconf_channel_set_string (xfconf_channel_get ("explorer"), "/explorer-theme", slug);
++  thunar_application_apply_theme (slug);
++}
++
+ static void
+ thunar_application_load_css (void)
+ {
+   GtkCssProvider *css_provider;
+   GdkScreen      *screen;
+-  GtkSettings    *gtk_settings;
+-  GtkCssProvider *explorer_provider;
+-  gchar          *explorer_css_path;
+-
+-  /* Explorer: wymuś ciemny motyw Win11 i ikony Win11-dark (jak w Explorerze) */
+-  gtk_settings = gtk_settings_get_default ();
+-  if (gtk_settings != NULL)
+-    g_object_set (gtk_settings,
+-                  "gtk-application-prefer-dark-theme", TRUE,
+-                  "gtk-icon-theme-name", "Win11-dark",
+-                  NULL);
++  gchar          *slug;
+ 
+-  explorer_provider = gtk_css_provider_new ();
+-  explorer_css_path = g_build_filename (DATADIR, "explorer", "explorer.css", NULL);
+-  if (gtk_css_provider_load_from_path (explorer_provider, explorer_css_path, NULL))
+-    gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+-                                               GTK_STYLE_PROVIDER (explorer_provider),
+-                                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+-  g_free (explorer_css_path);
+-  g_object_unref (explorer_provider);
++  /* Explorer: zastosuj wybrany motyw (kolory + jasny/ciemny + ikony) */
++  slug = xfconf_channel_get_string (xfconf_channel_get ("explorer"), "/explorer-theme", "fluent-dark");
++  thunar_application_apply_theme (slug);
++  g_free (slug);
+ 
+   css_provider = gtk_css_provider_new ();
+ 
+--- thunar/thunar-application.h.t5	2026-06-19 23:52:12.647137100 +0200
++++ thunar/thunar-application.h	2026-06-19 23:53:04.811445900 +0200
+@@ -208,6 +208,13 @@
+ void
+ thunar_application_malloc_trim_on_idle (ThunarApplication *application);
+ 
++/* Explorer: motywy kolorów */
++void
++thunar_application_apply_theme (const gchar *slug);
++
++void
++thunar_application_set_theme (const gchar *slug);
++
+ G_END_DECLS;
+ 
+ #endif /* !__THUNAR_APPLICATION_H__ */

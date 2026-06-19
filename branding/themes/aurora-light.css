@@ -1,0 +1,47 @@
+/* Explorer — motyw Aurora · Jasny (generowane z scripts/gen-themes.py) */
+* { font-family: "Segoe UI", "Noto Sans", sans-serif; font-size: 10pt; }
+
+window, .background, dialog, popover { background-color: #eceff4; color: #2e3440; }
+
+treeview.view, iconview { background-color: #ffffff; color: #2e3440; border: none; outline: none; }
+treeview.view:hover, iconview:hover { background-color: #e3e9f1; }
+treeview.view:selected, iconview:selected, iconview .cell:selected, treeview.view:selected:focus {
+  background-color: rgba(94,129,172,.17); color: #2e3440; }
+treeview.view header button { background-color: #ffffff; color: #4c566a;
+  border: none; border-bottom: 1px solid #dbe1ea; padding: 5px 8px; }
+treeview.view header button:hover { background-color: #e3e9f1; }
+
+.sidebar, .sidebar treeview.view, placessidebar, placessidebar list {
+  background-color: #e9edf4; color: #2e3440; }
+
+toolbar, headerbar, .toolbar { background-color: #eceff4; color: #2e3440;
+  border: none; border-bottom: 1px solid #dbe1ea; padding: 4px 6px; }
+
+button { background-color: transparent; color: #2e3440; border: none; border-radius: 5px; padding: 5px 10px; }
+button:hover { background-color: #e3e9f1; }
+button:active, button:checked { background-color: #d8e0ec; }
+
+entry { background-color: #ffffff; color: #2e3440; border: 1px solid #d3dae4;
+  border-radius: 5px; padding: 4px 8px; }
+entry:focus { border-color: #5e81ac; }
+
+.path-bar button, .location-bar button { background-color: transparent; color: #4c566a; border-radius: 4px; padding: 3px 8px; }
+.path-bar button:hover, .location-bar button:hover { background-color: #e0e7f0; color: #2e3440; }
+
+menu, .menu, popover.menu, .context-menu { background-color: #eceff4; color: #2e3440; border: 1px solid #dbe1ea; padding: 4px; }
+menuitem { border-radius: 4px; padding: 6px 14px; }
+menuitem:hover, menuitem:selected { background-color: #e3e9f1; color: #2e3440; }
+menubar { background-color: #eceff4; color: #2e3440; }
+menubar > menuitem:hover { background-color: #e3e9f1; }
+separator { background-color: #dbe1ea; min-height: 1px; min-width: 1px; }
+
+statusbar, .statusbar { background-color: #e5e9f0; color: #4c566a; border-top: 1px solid #dbe1ea; }
+
+scrollbar { background-color: #eceff4; border: none; }
+scrollbar slider { background-color: #c3ccda; border-radius: 6px; min-width: 8px; min-height: 30px; }
+scrollbar slider:hover { background-color: #a9b4c6; }
+
+paned > separator { background-color: #dbe1ea; }
+notebook, notebook header { background-color: #eceff4; border-color: #dbe1ea; }
+notebook tab { background-color: #e5e9f0; color: #4c566a; padding: 4px 10px; }
+notebook tab:checked { background-color: rgba(94,129,172,.17); color: #2e3440; }

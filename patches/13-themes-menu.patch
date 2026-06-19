@@ -1,0 +1,89 @@
+--- thunar/thunar-window.c.t5	2026-06-19 23:53:51.462317300 +0200
++++ thunar/thunar-window.c	2026-06-19 23:54:43.039946400 +0200
+@@ -32,6 +32,8 @@
+ 
+ #include "thunar/thunar-action-manager.h"
+ #include "thunar/thunar-application.h"
++
++#include <xfconf/xfconf.h>
+ #include "thunar/thunar-browser.h"
+ #include "thunar/thunar-clipboard-manager.h"
+ #include "thunar/thunar-compact-view.h"
+@@ -270,6 +272,8 @@
+ thunar_window_action_statusbar_changed (ThunarWindow *window);
+ static void
+ thunar_window_action_menubar_update (ThunarWindow *window);
++static void
++thunar_window_explorer_append_theme_menu (ThunarWindow *window);
+ static gboolean
+ thunar_window_action_menubar_changed (ThunarWindow *window);
+ static gboolean
+@@ -1029,6 +1033,7 @@
+   thunar_window_create_menu (window, THUNAR_WINDOW_ACTION_VIEW_MENU, G_CALLBACK (thunar_window_update_view_menu), window->menubar);
+   thunar_window_create_menu (window, THUNAR_WINDOW_ACTION_GO_MENU, G_CALLBACK (thunar_window_update_go_menu), window->menubar);
+   thunar_window_create_menu (window, THUNAR_WINDOW_ACTION_BOOKMARKS_MENU, G_CALLBACK (thunar_window_update_bookmarks_menu), window->menubar);
++  thunar_window_explorer_append_theme_menu (window);
+   thunar_window_create_menu (window, THUNAR_WINDOW_ACTION_HELP_MENU, G_CALLBACK (thunar_window_update_help_menu), window->menubar);
+   gtk_widget_show_all (window->menubar);
+ 
+@@ -6713,6 +6718,60 @@
+ }
+ 
+ 
++
++static void
++thunar_window_explorer_theme_activate (GtkCheckMenuItem *item,
++                                       gpointer          user_data)
++{
++  const gchar *slug;
++
++  if (!gtk_check_menu_item_get_active (item))
++    return;
++  slug = g_object_get_data (G_OBJECT (item), "explorer-theme-slug");
++  if (slug != NULL)
++    thunar_application_set_theme (slug);
++}
++
++
++
++static void
++thunar_window_explorer_append_theme_menu (ThunarWindow *window)
++{
++  static const struct { const gchar *slug; const gchar *label; } themes[] = {
++    { "fluent-dark", "Fluent \xc2\xb7 Ciemny" },    { "fluent-light", "Fluent \xc2\xb7 Jasny" },
++    { "aurora-dark", "Aurora \xc2\xb7 Ciemny" },    { "aurora-light", "Aurora \xc2\xb7 Jasny" },
++    { "porcelain-dark", "Porcelain \xc2\xb7 Ciemny" }, { "porcelain-light", "Porcelain \xc2\xb7 Jasny" },
++    { "cobalt-dark", "Cobalt \xc2\xb7 Ciemny" },    { "cobalt-light", "Cobalt \xc2\xb7 Jasny" },
++  };
++  GtkWidget *item;
++  GtkWidget *submenu;
++  GtkWidget *radio;
++  GSList    *group = NULL;
++  gchar     *current;
++  guint      i;
++
++  current = xfconf_channel_get_string (xfconf_channel_get ("explorer"), "/explorer-theme", "fluent-dark");
++
++  item = gtk_menu_item_new_with_label (_("Theme"));
++  submenu = gtk_menu_new ();
++  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), submenu);
++
++  for (i = 0; i < G_N_ELEMENTS (themes); i++)
++    {
++      radio = gtk_radio_menu_item_new_with_label (group, themes[i].label);
++      group = gtk_radio_menu_item_get_group (GTK_RADIO_MENU_ITEM (radio));
++      if (g_strcmp0 (current, themes[i].slug) == 0)
++        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (radio), TRUE);
++      g_object_set_data_full (G_OBJECT (radio), "explorer-theme-slug", g_strdup (themes[i].slug), g_free);
++      g_signal_connect (radio, "activate", G_CALLBACK (thunar_window_explorer_theme_activate), NULL);
++      gtk_menu_shell_append (GTK_MENU_SHELL (submenu), radio);
++    }
++
++  g_free (current);
++  gtk_menu_shell_append (GTK_MENU_SHELL (window->menubar), item);
++}
++
++
+ 
+ static void
+ thunar_window_explorer_searchbox_activate (GtkSearchEntry *entry,
