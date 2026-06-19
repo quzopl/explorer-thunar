@@ -3,3 +3,4 @@ install/
 thunar-src/
 *.o
 *.so
+.cache/
