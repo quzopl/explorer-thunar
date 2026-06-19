@@ -1,0 +1,26 @@
+--- thunar/thunar-application.c.t2	2026-06-19 23:05:18.481375200 +0200
++++ thunar/thunar-application.c	2026-06-19 23:06:41.556203700 +0200
+@@ -694,6 +694,23 @@
+ {
+   GtkCssProvider *css_provider;
+   GdkScreen      *screen;
++  GtkSettings    *gtk_settings;
++  GtkCssProvider *explorer_provider;
++  gchar          *explorer_css_path;
++
++  /* Explorer: wymuś ciemny motyw Win11 niezależnie od motywu systemu */
++  gtk_settings = gtk_settings_get_default ();
++  if (gtk_settings != NULL)
++    g_object_set (gtk_settings, "gtk-application-prefer-dark-theme", TRUE, NULL);
++
++  explorer_provider = gtk_css_provider_new ();
++  explorer_css_path = g_build_filename (DATADIR, "explorer", "explorer.css", NULL);
++  if (gtk_css_provider_load_from_path (explorer_provider, explorer_css_path, NULL))
++    gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
++                                               GTK_STYLE_PROVIDER (explorer_provider),
++                                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
++  g_free (explorer_css_path);
++  g_object_unref (explorer_provider);
+ 
+   css_provider = gtk_css_provider_new ();
+ 
