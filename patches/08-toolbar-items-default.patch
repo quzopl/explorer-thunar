@@ -1,0 +1,11 @@
+--- thunar/thunar-preferences.c.t3	2026-06-19 23:22:18.329834600 +0200
++++ thunar/thunar-preferences.c	2026-06-19 23:22:23.593263500 +0200
+@@ -675,7 +675,7 @@
+                        "new-tab:0,new-window:0,toggle-split-view:0,"
+                        "undo:0,redo:0,zoom-out:0,zoom-in:0,zoom-reset:0,"
+                        "view-as-icons:0,view-as-detailed-list:0,view-as-compact-list:0,view-switcher:0,"
+-                       "location-bar:1,reload:0,search:1",
++                       "location-bar:1,reload:0,search:1,explorer-search:1",
+                        EXO_PARAM_READWRITE);
+ 
+   /**

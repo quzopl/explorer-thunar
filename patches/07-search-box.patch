@@ -1,0 +1,67 @@
+--- thunar/thunar-window.c.t3	2026-06-19 23:20:36.124645300 +0200
++++ thunar/thunar-window.c	2026-06-19 23:27:01.544980400 +0200
+@@ -6715,6 +6715,29 @@
+ 
+ 
+ static void
++thunar_window_explorer_searchbox_activate (GtkSearchEntry *entry,
++                                           ThunarWindow   *window)
++{
++  const gchar *text;
++  gchar       *query;
++
++  _thunar_return_if_fail (THUNAR_IS_WINDOW (window));
++
++  text = gtk_entry_get_text (GTK_ENTRY (entry));
++  if (text == NULL || *text == '\0')
++    {
++      thunar_window_action_cancel_search (window);
++      return;
++    }
++
++  query = g_strconcat (thunar_util_get_search_prefix (), text, NULL);
++  thunar_window_start_open_location (window, query);
++  g_free (query);
++}
++
++
++
++static void
+ thunar_window_location_toolbar_create (ThunarWindow *window)
+ {
+   GtkToolItem *tool_item;
+@@ -6730,6 +6753,8 @@
+   /* setup the toolbar for the location bar */
+   window->location_toolbar = gtk_toolbar_new ();
+   gtk_toolbar_set_style (GTK_TOOLBAR (window->location_toolbar), GTK_TOOLBAR_ICONS);
++  /* Explorer: nie chowaj elementów (np. pola wyszukiwania) do menu przepełnienia */
++  gtk_toolbar_set_show_arrow (GTK_TOOLBAR (window->location_toolbar), FALSE);
+   gtk_toolbar_set_icon_size (GTK_TOOLBAR (window->location_toolbar),
+                              small_icons ? GTK_ICON_SIZE_SMALL_TOOLBAR : GTK_ICON_SIZE_LARGE_TOOLBAR);
+   gtk_widget_set_hexpand (window->location_toolbar, TRUE);
+@@ -6787,6 +6812,25 @@
+   thunar_window_create_toolbar_item_from_action (window, THUNAR_WINDOW_ACTION_RELOAD, item_order++);
+   window->location_toolbar_item_search = thunar_window_create_toolbar_toggle_item_from_action (window, THUNAR_WINDOW_ACTION_SEARCH, window->is_searching, item_order++);
+ 
++  /* Explorer: zawsze widoczne pole wyszukiwania (jak Windows) */
++  {
++    GtkToolItem *explorer_search_item = gtk_tool_item_new ();
++    GtkWidget   *explorer_searchbox = gtk_search_entry_new ();
++    gtk_widget_set_name (explorer_searchbox, "explorer-search");
++    gtk_entry_set_placeholder_text (GTK_ENTRY (explorer_searchbox), _("Szukaj"));
++    gtk_widget_set_size_request (explorer_searchbox, 220, -1);
++    gtk_widget_set_valign (explorer_searchbox, GTK_ALIGN_CENTER);
++    gtk_container_add (GTK_CONTAINER (explorer_search_item), explorer_searchbox);
++    g_signal_connect (G_OBJECT (explorer_searchbox), "activate",
++                      G_CALLBACK (thunar_window_explorer_searchbox_activate), window);
++    g_object_set_data_full (G_OBJECT (explorer_search_item), "id", g_strdup ("explorer-search"), g_free);
++    g_object_set_data_full (G_OBJECT (explorer_search_item), "label", g_strdup (_("Search Box")), g_free);
++    g_object_set_data_full (G_OBJECT (explorer_search_item), "icon", g_strdup ("system-search"), g_free);
++    thunar_g_object_set_guint_data (G_OBJECT (explorer_search_item), "default-order", item_order++);
++    gtk_toolbar_insert (GTK_TOOLBAR (window->location_toolbar), explorer_search_item, -1);
++    gtk_widget_show_all (GTK_WIDGET (explorer_search_item));
++  }
++
+   /* add custom actions to the toolbar */
+   thunar_window_location_toolbar_add_ucas (window);
+ 
