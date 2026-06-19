@@ -1,0 +1,11 @@
+--- thunar/thunar-preferences.c.t4	2026-06-19 23:39:53.526419000 +0200
++++ thunar/thunar-preferences.c	2026-06-19 23:39:59.363199400 +0200
+@@ -464,7 +464,7 @@
+   g_param_spec_boolean ("last-show-hidden",
+                         "LastShowHidden",
+                         NULL,
+-                        FALSE,
++                        TRUE,
+                         EXO_PARAM_READWRITE);
+ 
+   /**
