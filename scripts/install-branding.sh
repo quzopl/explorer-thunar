@@ -7,4 +7,7 @@ ln -sf thunar "$PREFIX/bin/explorer"
 # plik .desktop
 mkdir -p "$PREFIX/share/applications"
 install -m644 branding/explorer.desktop "$PREFIX/share/applications/explorer.desktop"
+# motyw CSS Win11
+mkdir -p "$PREFIX/share/explorer"
+install -m644 branding/explorer.css "$PREFIX/share/explorer/explorer.css"
 echo "OK: branding zainstalowany"
