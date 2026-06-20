@@ -4,3 +4,5 @@ thunar-src/
 *.o
 *.so
 .cache/
+dist/
+AppDir/
