@@ -8,5 +8,5 @@ Icon=system-file-manager
 Terminal=false
 Categories=System;Utility;Core;GTK;FileManager;
 StartupNotify=true
-StartupWMClass=eu.mizak.Explorer
+StartupWMClass=explorer
 MimeType=inode/directory;
