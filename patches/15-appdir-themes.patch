@@ -1,0 +1,18 @@
+--- thunar/thunar-application.c.t7	2026-06-20 11:10:52.681295100 +0200
++++ thunar/thunar-application.c	2026-06-20 11:11:00.158127000 +0200
+@@ -724,7 +724,14 @@
+     }
+ 
+   file = g_strconcat (slug, ".css", NULL);
+-  full = g_build_filename (DATADIR, "explorer", "themes", file, NULL);
++  {
++    /* Explorer: w AppImage dane są pod $APPDIR/usr/share, inaczej pod DATADIR */
++    const gchar *appdir = g_getenv ("APPDIR");
++    if (appdir != NULL && *appdir != '\0')
++      full = g_build_filename (appdir, "usr", "share", "explorer", "themes", file, NULL);
++    else
++      full = g_build_filename (DATADIR, "explorer", "themes", file, NULL);
++  }
+   gtk_css_provider_load_from_path (explorer_theme_provider, full, NULL);
+   g_free (full);
+   g_free (file);
