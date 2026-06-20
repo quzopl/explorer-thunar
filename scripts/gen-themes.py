@@ -79,9 +79,10 @@ TEMPLATE = """/* Explorer — motyw {label} (generowane z scripts/gen-themes.py)
 
 window, .background, dialog, popover {{ background-color: {toolbar}; color: {text}; }}
 
+.standard-view, .standard-view .view, .standard-view .view text,
 treeview.view, iconview {{ background-color: {content}; color: {text}; border: none; outline: none; }}
-treeview.view:hover, iconview:hover {{ background-color: {hover}; }}
-treeview.view:selected, iconview:selected, iconview .cell:selected, treeview.view:selected:focus {{
+.standard-view .view:hover, treeview.view:hover, iconview:hover {{ background-color: {hover}; }}
+.standard-view .view:selected, treeview.view:selected, iconview:selected, iconview .cell:selected {{
   background-color: {sel_bg}; color: {text}; }}
 treeview.view header button {{ background-color: {content}; color: {header_text};
   border: none; border-bottom: 1px solid {border}; padding: 5px 8px; }}

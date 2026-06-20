@@ -3,9 +3,10 @@
 
 window, .background, dialog, popover { background-color: #eceff4; color: #2e3440; }
 
+.standard-view, .standard-view .view, .standard-view .view text,
 treeview.view, iconview { background-color: #ffffff; color: #2e3440; border: none; outline: none; }
-treeview.view:hover, iconview:hover { background-color: #e3e9f1; }
-treeview.view:selected, iconview:selected, iconview .cell:selected, treeview.view:selected:focus {
+.standard-view .view:hover, treeview.view:hover, iconview:hover { background-color: #e3e9f1; }
+.standard-view .view:selected, treeview.view:selected, iconview:selected, iconview .cell:selected {
   background-color: rgba(94,129,172,.17); color: #2e3440; }
 treeview.view header button { background-color: #ffffff; color: #4c566a;
   border: none; border-bottom: 1px solid #dbe1ea; padding: 5px 8px; }
