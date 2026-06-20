@@ -1,0 +1,49 @@
+--- thunar/main.c.t8	2026-06-20 11:41:17.281586600 +0200
++++ thunar/main.c	2026-06-20 11:41:27.368447500 +0200
+@@ -50,6 +50,9 @@
+   ThunarApplication *application;
+   GError            *error = NULL;
+ 
++  /* Explorer: force English UI regardless of the system locale */
++  g_setenv ("LANGUAGE", "en_US:en", TRUE);
++
+   /* setup translation domain */
+   xfce_textdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR, "UTF-8");
+ 
+--- thunar/thunar-window.c.t8	2026-06-20 11:41:17.284920000 +0200
++++ thunar/thunar-window.c	2026-06-20 11:41:43.175418200 +0200
+@@ -6738,10 +6738,10 @@
+ thunar_window_explorer_append_theme_menu (ThunarWindow *window)
+ {
+   static const struct { const gchar *slug; const gchar *label; } themes[] = {
+-    { "fluent-dark", "Fluent \xc2\xb7 Ciemny" },    { "fluent-light", "Fluent \xc2\xb7 Jasny" },
+-    { "aurora-dark", "Aurora \xc2\xb7 Ciemny" },    { "aurora-light", "Aurora \xc2\xb7 Jasny" },
+-    { "porcelain-dark", "Porcelain \xc2\xb7 Ciemny" }, { "porcelain-light", "Porcelain \xc2\xb7 Jasny" },
+-    { "cobalt-dark", "Cobalt \xc2\xb7 Ciemny" },    { "cobalt-light", "Cobalt \xc2\xb7 Jasny" },
++    { "fluent-dark", "Fluent \xc2\xb7 Dark" },    { "fluent-light", "Fluent \xc2\xb7 Light" },
++    { "aurora-dark", "Aurora \xc2\xb7 Dark" },    { "aurora-light", "Aurora \xc2\xb7 Light" },
++    { "porcelain-dark", "Porcelain \xc2\xb7 Dark" }, { "porcelain-light", "Porcelain \xc2\xb7 Light" },
++    { "cobalt-dark", "Cobalt \xc2\xb7 Dark" },    { "cobalt-light", "Cobalt \xc2\xb7 Light" },
+   };
+   GtkWidget *item;
+   GtkWidget *submenu;
+@@ -6876,7 +6876,7 @@
+     GtkToolItem *explorer_search_item = gtk_tool_item_new ();
+     GtkWidget   *explorer_searchbox = gtk_search_entry_new ();
+     gtk_widget_set_name (explorer_searchbox, "explorer-search");
+-    gtk_entry_set_placeholder_text (GTK_ENTRY (explorer_searchbox), _("Szukaj"));
++    gtk_entry_set_placeholder_text (GTK_ENTRY (explorer_searchbox), _("Search"));
+     gtk_widget_set_size_request (explorer_searchbox, 220, -1);
+     gtk_widget_set_valign (explorer_searchbox, GTK_ALIGN_CENTER);
+     gtk_container_add (GTK_CONTAINER (explorer_search_item), explorer_searchbox);
+--- plugins/thunar-uca/uca.xml.in.t8	2026-06-20 11:41:17.284920000 +0200
++++ plugins/thunar-uca/uca.xml.in	2026-06-20 11:41:50.742230200 +0200
+@@ -41,7 +41,7 @@
+     <range></range>
+     <name>Open Terminal Here</name>
+     <command>konsole --workdir %f</command>
+-    <description>Otwiera terminal w bieżącym folderze</description>
++    <description>Open a terminal in the current folder</description>
+     <startup-notify/>
+     <directories/>
+   </action>
