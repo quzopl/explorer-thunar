@@ -1,0 +1,12 @@
+--- thunar/thunar-application.c.t6	2026-06-20 10:41:47.030284800 +0200
++++ thunar/thunar-application.c	2026-06-20 10:42:02.447258500 +0200
+@@ -355,7 +355,8 @@
+                                       const gchar     *name,
+                                       gpointer         user_data)
+ {
+-  g_warning (_("Name '%s' lost on the message dbus."), name);
++  /* Explorer: cicho — jako osobna aplikacja nie przejmujemy współdzielonych
++   * nazw FileManager (trzyma je systemowy menedżer); to oczekiwane. */
+ }
+ 
+ 

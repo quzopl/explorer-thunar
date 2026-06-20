@@ -12,8 +12,10 @@ treeview.view header button { background-color: #ffffff; color: #86868b;
   border: none; border-bottom: 1px solid #e6e6e8; padding: 5px 8px; }
 treeview.view header button:hover { background-color: #f0f0f3; }
 
-.sidebar, .sidebar treeview.view, placessidebar, placessidebar list {
+.sidebar, .sidebar .view, .sidebar treeview.view, placessidebar, placessidebar list {
   background-color: #f4f5f7; color: #1d1d1f; }
+.sidebar .view:hover, .sidebar treeview.view:hover { background-color: #f0f0f3; }
+.sidebar label { color: #1d1d1f; }
 
 toolbar, headerbar, .toolbar { background-color: #f6f6f6; color: #1d1d1f;
   border: none; border-bottom: 1px solid #e6e6e8; padding: 4px 6px; }

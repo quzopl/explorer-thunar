@@ -63,7 +63,8 @@ PALETTES = {
         "accent": "#3d7bff", "sel_bg": "rgba(61,123,255,.26)", "crumb_hover": "#162946",
         "field": "#0a1730", "field_border": "#21385f",
         "statusbar": "#070e1c", "statusbar_text": "#7e93ba",
-        "scroll": "#21385f", "scroll_hover": "#2e4d7e"}),
+        "scroll": "#21385f", "scroll_hover": "#2e4d7e",
+        "sb_text": "#c8d6f0"}),
     "cobalt-light": ("Cobalt · Jasny", "light", {
         "toolbar": "#ffffff", "content": "#ffffff", "sidebar": "#0e2a5e",
         "text": "#10213d", "text_dim": "#5b6b86", "header_text": "#2f6fed",
@@ -71,7 +72,8 @@ PALETTES = {
         "accent": "#2f6fed", "sel_bg": "rgba(47,111,237,.13)", "crumb_hover": "#eaf1fd",
         "field": "#f3f7fd", "field_border": "#d4e0f4",
         "statusbar": "#0e2a5e", "statusbar_text": "#aebfe0",
-        "scroll": "#cdd9ee", "scroll_hover": "#aabfe2"}),
+        "scroll": "#cdd9ee", "scroll_hover": "#aabfe2",
+        "sb_text": "#dbe6fa", "sb_hover": "rgba(255,255,255,.08)"}),
 }
 
 TEMPLATE = """/* Explorer — motyw {label} (generowane z scripts/gen-themes.py) */
@@ -88,8 +90,10 @@ treeview.view header button {{ background-color: {content}; color: {header_text}
   border: none; border-bottom: 1px solid {border}; padding: 5px 8px; }}
 treeview.view header button:hover {{ background-color: {hover}; }}
 
-.sidebar, .sidebar treeview.view, placessidebar, placessidebar list {{
-  background-color: {sidebar}; color: {text}; }}
+.sidebar, .sidebar .view, .sidebar treeview.view, placessidebar, placessidebar list {{
+  background-color: {sidebar}; color: {sb_text}; }}
+.sidebar .view:hover, .sidebar treeview.view:hover {{ background-color: {sb_hover}; }}
+.sidebar label {{ color: {sb_text}; }}
 
 toolbar, headerbar, .toolbar {{ background-color: {toolbar}; color: {text};
   border: none; border-bottom: 1px solid {border}; padding: 4px 6px; }}
@@ -130,7 +134,10 @@ def main():
     out = os.path.join(here, "branding", "themes")
     os.makedirs(out, exist_ok=True)
     for slug, (label, _mode, p) in PALETTES.items():
-        css = TEMPLATE.format(label=label, **p)
+        tokens = dict(p)
+        tokens.setdefault("sb_text", p["text"])
+        tokens.setdefault("sb_hover", p["hover"])
+        css = TEMPLATE.format(label=label, **tokens)
         with open(os.path.join(out, slug + ".css"), "w") as f:
             f.write(css)
         print("zapisano", slug + ".css")

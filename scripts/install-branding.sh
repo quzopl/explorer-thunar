@@ -4,9 +4,14 @@ cd "$(dirname "$0")/.."
 PREFIX="$PWD/install"
 # binarka explorer = dowiązanie do zbudowanego thunar
 ln -sf thunar "$PREFIX/bin/explorer"
-# plik .desktop
+# plik .desktop (w prefiksie + w ~/.local/share/applications jako nazwa app-id,
+# żeby KDE skojarzyło okno (app_id eu.mizak.Explorer) z wpisem -> pasek zadań/ikona)
 mkdir -p "$PREFIX/share/applications"
 install -m644 branding/explorer.desktop "$PREFIX/share/applications/explorer.desktop"
+USER_APPS="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
+mkdir -p "$USER_APPS"
+install -m644 branding/explorer.desktop "$USER_APPS/eu.mizak.Explorer.desktop"
+update-desktop-database "$USER_APPS" 2>/dev/null || true
 # motyw CSS Win11 + palety motywów
 mkdir -p "$PREFIX/share/explorer/themes"
 install -m644 branding/explorer.css "$PREFIX/share/explorer/explorer.css"
