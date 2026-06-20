@@ -5,6 +5,15 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT="$PWD"; AD="$ROOT/AppDir"
 
+# allow tools downloaded to /tmp to be found by bare name
+for t in linuxdeploy appimagetool; do
+  command -v "$t" >/dev/null 2>&1 && continue
+  for c in "/tmp/$t" "/tmp/$t.AppImage" "/tmp/$t-x86_64.AppImage"; do
+    [ -x "$c" ] && { ln -sf "$c" "/tmp/$t"; break; }
+  done
+done
+export PATH="/tmp:$PATH"
+
 # 1. build z prefiksem /usr do AppDir
 cd thunar-src
 ./configure --prefix=/usr --disable-static
