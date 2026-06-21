@@ -1,0 +1,31 @@
+--- thunar/thunar-application.c.orig	2026-06-21 21:44:36.525483100 +0200
++++ thunar/thunar-application.c	2026-06-21 21:44:51.392766500 +0200
+@@ -733,6 +733,28 @@
+       full = g_build_filename (DATADIR, "explorer", "themes", file, NULL);
+   }
+   gtk_css_provider_load_from_path (explorer_theme_provider, full, NULL);
++
++  /* Explorer: a runtime theme switch can leave widgets (the menubar, the
++   * view, and the area under the just-closed theme menu) with a stale or
++   * never-painted (black) background.  Force every toplevel and all of its
++   * child windows to re-resolve their CSS and fully repaint. */
++  {
++    GList *toplevels = gtk_window_list_toplevels ();
++    GList *lp;
++    for (lp = toplevels; lp != NULL; lp = lp->next)
++      {
++        GtkWidget *toplevel = GTK_WIDGET (lp->data);
++        GdkWindow *gdkwindow;
++
++        gtk_widget_reset_style (toplevel);
++        gdkwindow = gtk_widget_get_window (toplevel);
++        if (gdkwindow != NULL)
++          gdk_window_invalidate_rect (gdkwindow, NULL, TRUE);
++        gtk_widget_queue_draw (toplevel);
++      }
++    g_list_free (toplevels);
++  }
++
+   g_free (full);
+   g_free (file);
+ }
