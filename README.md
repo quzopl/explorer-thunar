@@ -4,6 +4,22 @@ A fork of **Thunar 4.20.8** rebranded as a standalone app called **"Explorer"**,
 with a dark Windows 11 theme, Windows-like defaults and an always-visible search
 box in the toolbar. It runs **alongside** the system Thunar without overriding it.
 
+## Screenshots
+
+The "Theme" menu ships **8 palettes** (Fluent / Aurora / Porcelain / Cobalt, each
+in Dark and Light), switchable live. A few of them:
+
+| Fluent · Dark | Cobalt · Dark |
+| --- | --- |
+| ![Fluent Dark](docs/screenshots/01-fluent-dark.png) | ![Cobalt Dark](docs/screenshots/02-cobalt-dark.png) |
+| **Aurora · Light** | **Porcelain · Light** |
+| ![Aurora Light](docs/screenshots/03-aurora-light.png) | ![Porcelain Light](docs/screenshots/04-porcelain-light.png) |
+
+Every screenshot shows the same window: an always-visible **Search** box (top
+right), the **view switchers** (icons / details / compact) in the toolbar, a
+Windows-style **Places / Devices / Network** sidebar with all disks, and an
+English UI regardless of system locale.
+
 ## Features
 
 - **Look:** built-in Windows 11 theme (GTK CSS), forced independently of the
