@@ -5,6 +5,7 @@ PREFIX="$PWD/install"
 cd thunar-src
 if [ ! -f config.status ]; then
   ./configure --prefix="$PREFIX" --disable-static --enable-gio-unix \
+    --disable-introspection \
     --with-locales-dir="$PREFIX/share/locale"
 fi
 make -j"$(nproc)"

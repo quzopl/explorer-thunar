@@ -98,9 +98,20 @@ treeview.view header button:hover {{ background-color: {hover}; }}
 toolbar, headerbar, .toolbar {{ background-color: {toolbar}; color: {text};
   border: none; border-bottom: 1px solid {border}; padding: 4px 6px; }}
 
-button {{ background-color: transparent; color: {text}; border: none; border-radius: 5px; padding: 5px 10px; }}
-button:hover {{ background-color: {hover}; }}
-button:active, button:checked {{ background-color: {pressed}; }}
+/* background-image/box-shadow: none — kasuje gradient/cień przycisku z
+ * systemowego motywu GTK (np. Breeze-Dark na KDE), który inaczej przebija
+ * jako ciemny/czarny prostokąt na aktywnym przycisku widoku. */
+button {{ background-color: transparent; background-image: none; box-shadow: none;
+  color: {text}; border: none; border-radius: 5px; padding: 5px 10px; }}
+button:hover {{ background-color: {hover}; background-image: none; box-shadow: none; }}
+button:active, button:checked {{ background-color: {pressed}; background-image: none; box-shadow: none; }}
+
+/* aktywny przycisk widoku (ikony/szczegóły/kompakt) w pasku narzędzi —
+ * subtelny akcent zamiast brzydkiego ciemnego kwadratu */
+toolbar button:checked, .toolbar button:checked,
+toolbar togglebutton:checked, toolbar button:active {{
+  background-color: {sel_bg}; background-image: none; box-shadow: none; color: {text}; }}
+toolbar button:checked:hover, .toolbar button:checked:hover {{ background-color: {hover}; }}
 
 entry {{ background-color: {field}; color: {text}; border: 1px solid {field_border};
   border-radius: 5px; padding: 4px 8px; }}

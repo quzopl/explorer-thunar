@@ -1,0 +1,59 @@
+--- thunar/thunar-application.c.t10	2026-06-23 10:30:00.000000000 +0200
++++ thunar/thunar-application.c	2026-06-23 10:30:30.000000000 +0200
+@@ -694,6 +694,47 @@
+ /* Explorer: dostawca CSS aktywnego motywu (żywa zmiana w trakcie działania) */
+ static GtkCssProvider *explorer_theme_provider = NULL;
+ 
++/* Explorer: czy motyw ikon o danej nazwie jest zainstalowany (ma index.theme)?
++ * Bez tego wymuszamy "Win11"/"Win11-dark", których użytkownik może nie mieć,
++ * a GTK pokazuje wtedy popsute/niespójne ikony. */
++static gboolean
++explorer_icon_theme_exists (const gchar *name)
++{
++  gchar       *user_icons = g_build_filename (g_get_user_data_dir (), "icons", NULL);
++  gchar       *home_icons = g_build_filename (g_get_home_dir (), ".icons", NULL);
++  const gchar *dirs[] = { user_icons, home_icons, "/usr/share/icons" };
++  gboolean     found = FALSE;
++  guint        i;
++
++  for (i = 0; i < G_N_ELEMENTS (dirs) && !found; i++)
++    {
++      gchar *idx = g_build_filename (dirs[i], name, "index.theme", NULL);
++      found = g_file_test (idx, G_FILE_TEST_EXISTS);
++      g_free (idx);
++    }
++
++  g_free (user_icons);
++  g_free (home_icons);
++  return found;
++}
++
++/* Explorer: wybierz motyw ikon — najpierw Win11 (jeśli jest), potem sensowny
++ * zainstalowany fallback, by ikony zawsze były spójne z jasnym/ciemnym UI. */
++static const gchar *
++explorer_pick_icon_theme (gboolean dark)
++{
++  static const gchar *dark_pref[]  = { "Win11-dark", "Win11", "breeze-dark", "Adwaita", NULL };
++  static const gchar *light_pref[] = { "Win11", "Win11-dark", "breeze", "Adwaita", NULL };
++  const gchar **pref = dark ? dark_pref : light_pref;
++  guint i;
++
++  for (i = 0; pref[i] != NULL; i++)
++    if (explorer_icon_theme_exists (pref[i]))
++      return pref[i];
++
++  return dark ? "breeze-dark" : "breeze";
++}
++
+ void
+ thunar_application_apply_theme (const gchar *slug)
+ {
+@@ -712,7 +753,7 @@
+   if (settings != NULL)
+     g_object_set (settings,
+                   "gtk-application-prefer-dark-theme", dark,
+-                  "gtk-icon-theme-name", dark ? "Win11-dark" : "Win11",
++                  "gtk-icon-theme-name", explorer_pick_icon_theme (dark),
+                   NULL);
+ 
+   if (explorer_theme_provider == NULL)
