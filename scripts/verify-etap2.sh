@@ -2,8 +2,8 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 fail=0
-echo "== CSS zainstalowany =="
-[ -f install/share/explorer/explorer.css ] && echo "css OK" || { echo "BRAK css"; fail=1; }
+echo "== palety motywów zainstalowane =="
+[ -f install/share/explorer/themes/fluent-dark.css ] && echo "css OK" || { echo "BRAK palet"; fail=1; }
 echo "== start bez błędów parsowania CSS / GDK =="
 timeout 8 ./install/bin/explorer "$HOME" 2>/tmp/exp-v2.err & MYPID=$!
 for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q io.github.quzopl.Explorer && break; sleep 1; done

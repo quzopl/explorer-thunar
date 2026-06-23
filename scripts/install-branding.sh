@@ -19,8 +19,7 @@ rm -f "$USER_APPS/io.github.quzopl.Explorer.desktop"   # poprzednia, błędna na
 install -m644 "$DESKTOP_TMP" "$USER_APPS/explorer.desktop"
 rm -f "$DESKTOP_TMP"
 update-desktop-database "$USER_APPS" 2>/dev/null || true
-# motyw CSS Win11 + palety motywów
+# palety motywów (8 palet; bazowy explorer.css nie jest już używany od patcha 12)
 mkdir -p "$PREFIX/share/explorer/themes"
-install -m644 branding/explorer.css "$PREFIX/share/explorer/explorer.css"
 install -m644 branding/themes/*.css "$PREFIX/share/explorer/themes/"
 echo "OK: branding zainstalowany"

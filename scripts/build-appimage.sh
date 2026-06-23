@@ -15,15 +15,15 @@ done
 export PATH="/tmp:$PATH"
 
 # 1. build z prefiksem /usr do AppDir
+# --disable-introspection: bez tego build pada na 'Thunarx-3.0.typelib'
 cd thunar-src
-./configure --prefix=/usr --disable-static
+./configure --prefix=/usr --disable-static --disable-introspection
 make -j"$(nproc)"
 make install DESTDIR="$AD"
 cd "$ROOT"
 
 # 2. branding + symlink + desktop
 mkdir -p "$AD/usr/share/explorer/themes" "$AD/usr/share/applications"
-install -m644 branding/explorer.css "$AD/usr/share/explorer/explorer.css"
 install -m644 branding/themes/*.css "$AD/usr/share/explorer/themes/"
 ln -sf thunar "$AD/usr/bin/explorer"
 sed 's/^Exec=.*/Exec=explorer %F/; s/^Icon=.*/Icon=explorer/' \

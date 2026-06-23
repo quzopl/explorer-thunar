@@ -37,7 +37,8 @@ English UI regardless of system locale.
   `tumbler`), folders first, double-click.
 - **Search:** an always-visible "Search" box at the top-right of the toolbar
   (like Windows) plus Thunar's native recursive search (also `Ctrl+F`).
-- **Hidden files** shown by default. **Icons:** Win11-dark (light themes → Win11).
+- **Hidden files** shown by default. **Icons:** Win11-dark (light themes → Win11),
+  with a graceful fallback to an installed theme (e.g. `breeze`) when absent.
 - **Terminal:** right-click in a folder → "Open Terminal Here" launches `konsole`.
 - **All drives:** `scripts/enable-gvfs-drives.sh` (sudo) adds `x-gvfs-show` to
   `/mnt/*` fstab entries so every disk appears under "Devices".
@@ -46,18 +47,34 @@ English UI regardless of system locale.
 
 ## Building from scratch
 
-Requirements: a GTK3/XFCE toolchain (on Arch/Manjaro: `gtk3 libxfce4ui
+**Build** requirements: a GTK3/XFCE toolchain (on Arch/Manjaro: `gtk3 libxfce4ui
 libxfce4util exo xfconf gudev`), `gcc`, `make`, `patch`, `curl`, `tumbler`
 (thumbnails).
 
+**Runtime** requirements (Arch/Manjaro):
+
+- `gvfs` + `gvfs-smb` — **required for network drives** (`smb://`, `sftp://`) and
+  the "Network" sidebar entry; also removable-device mounting. Optional:
+  `gvfs-mtp` (phones), `gvfs-nfs` (NFS).
+- `konsole` — used by the "Open Terminal Here" action.
+- a `Win11` / `Win11-dark` icon theme (optional) — for the Windows look; without
+  it the app falls back to an installed theme (e.g. `breeze`).
+
 ```bash
 bash scripts/fetch-sources.sh     # download Thunar 4.20.8 into thunar-src/
-bash scripts/apply-patches.sh     # apply patches/01..16
+bash scripts/apply-patches.sh     # apply patches/01..19
 bash scripts/build.sh             # ./configure + make + make install -> install/
-bash scripts/install-branding.sh  # explorer binary, .desktop, icon, CSS, themes
+bash scripts/install-branding.sh  # explorer binary, .desktop, icon, themes
 ```
 
 Run it: `./install/bin/explorer`
+
+### Network drives
+
+There is no "Connect to Server" dialog (this is Thunar). Install `gvfs gvfs-smb`,
+then press **Ctrl+L** and type a URL, e.g. `smb://server/share` or
+`sftp://host/path`; drag the opened folder onto the sidebar to bookmark it. Local
+`/mnt/*` disks: run `sudo bash scripts/enable-gvfs-drives.sh`.
 
 ### Building the AppImage
 
@@ -71,7 +88,7 @@ bash scripts/build-appimage.sh    # -> dist/Explorer-x86_64.AppImage
 
 ```bash
 bash scripts/verify-etap1.sh   # foundation: separate app-id, alongside system Thunar
-bash scripts/verify-etap2.sh   # look: CSS loads, starts without errors
+bash scripts/verify-etap2.sh   # look: theme palettes installed, starts without errors
 bash scripts/verify-etap3.sh   # toolbar search box
 ```
 
@@ -79,7 +96,7 @@ bash scripts/verify-etap3.sh   # toolbar search box
 
 - `thunar-src/` — Thunar sources (git-ignored; reproducible from the tarball).
 - `patches/` — every C change (reproducible after `fetch-sources.sh`).
-- `branding/` — `explorer.desktop`, `explorer.css`, `themes/*.css` (8 palettes).
+- `branding/` — `explorer.desktop`, `themes/*.css` (8 palettes).
 - `scripts/` — fetch, patch, build, branding, AppImage, drives, verification.
 - `docs/superpowers/` — design specs and implementation plans.
 
@@ -88,7 +105,7 @@ it up automatically.
 
 ## How it works
 
-All C changes live in `patches/01..16` and are applied on top of a pristine
+All C changes live in `patches/01..19` and are applied on top of a pristine
 Thunar 4.20.8 tree. Highlights: separate application id and Xfconf channel,
 forced dark Win11 CSS, default large icons + always-on thumbnails, an
 always-visible search entry wired to Thunar's native search, a theme switcher,
