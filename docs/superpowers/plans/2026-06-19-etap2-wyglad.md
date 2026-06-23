@@ -113,7 +113,7 @@ Expected: `OK: zainstalowano` + `OK: branding zainstalowany`, bez błędów komp
 Run:
 ```bash
 timeout 7 ./install/bin/explorer /tmp 2>/tmp/exp-theme.err & MYPID=$!
-for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q eu.mizak.Explorer && break; sleep 1; done
+for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q io.github.quzopl.Explorer && break; sleep 1; done
 grep -i "Theme parsing error\|segfault\|critical" /tmp/exp-theme.err && echo "SĄ BŁĘDY CSS" || echo "CSS OK (bez błędów parsowania)"
 wait $MYPID 2>/dev/null
 ```
@@ -164,7 +164,7 @@ Run:
 xfconf-query -c explorer -p /default-view -r 2>/dev/null || true
 xfconf-query -c explorer -p /misc-thumbnail-mode -r 2>/dev/null || true
 timeout 6 ./install/bin/explorer /tmp >/dev/null 2>&1 & MYPID=$!
-for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q eu.mizak.Explorer && break; sleep 1; done
+for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q io.github.quzopl.Explorer && break; sleep 1; done
 sleep 1
 echo "thumbnail-mode: $(xfconf-query -c explorer -p /misc-thumbnail-mode 2>/dev/null || echo '(domyślne z param-spec)')"
 wait $MYPID 2>/dev/null
@@ -198,7 +198,7 @@ echo "== CSS zainstalowany =="
 [ -f install/share/explorer/explorer.css ] && echo "css OK" || { echo "BRAK css"; fail=1; }
 echo "== start bez błędów parsowania CSS =="
 timeout 7 ./install/bin/explorer /tmp 2>/tmp/exp-v2.err & MYPID=$!
-for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q eu.mizak.Explorer && break; sleep 1; done
+for _ in 1 2 3 4 5; do busctl --user list 2>/dev/null | grep -q io.github.quzopl.Explorer && break; sleep 1; done
 if grep -qi "Theme parsing error\|segfault\|CRITICAL" /tmp/exp-v2.err; then echo "BŁĘDY"; cat /tmp/exp-v2.err; fail=1; else echo "start OK"; fi
 wait $MYPID 2>/dev/null
 [ "$fail" = 0 ] && echo "ETAP 2: SUKCES" || echo "ETAP 2: SĄ BŁĘDY"
@@ -222,5 +222,5 @@ git commit -m "test: skrypt weryfikacyjny Etapu 2"
 ## Self-Review
 
 - Motyw CSS → Task 1-3 ✓; domyślne ustawienia → Task 4 ✓; miniatury (tryb always) → Task 4 ✓; weryfikacja → Task 5 ✓.
-- Stałe nazwane spójnie: `eu.mizak.Explorer`, kanał `explorer`, `explorer.css`, `install/share/explorer/`.
+- Stałe nazwane spójnie: `io.github.quzopl.Explorer`, kanał `explorer`, `explorer.css`, `install/share/explorer/`.
 - Discovery (`DATADIR` w config.h, enum zoom/thumbnail) ma konkretne komendy `grep` — nie placeholdery.

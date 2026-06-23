@@ -13,7 +13,7 @@
 - Wszystko żyje w `/mnt/swiezak/explorer-thunar` (osobne repo git, poza repo Pythonowego Explorera).
 - Wersja Thunara: **dokładnie 4.20.8** (zgodna z systemową).
 - Instalacja **tylko** do `install/` w repo — nigdy do `/usr` (`ninja install` z prefiksem lokalnym, bez `sudo`).
-- Nowy identyfikator aplikacji/D-Bus: **`eu.mizak.Explorer`** (zastępuje `org.xfce.Thunar`).
+- Nowy identyfikator aplikacji/D-Bus: **`io.github.quzopl.Explorer`** (zastępuje `org.xfce.Thunar`).
 - Nowy kanał Xfconf: **`explorer`** (zastępuje `thunar`) — izolacja ustawień.
 - Nazwa binarki: **`explorer`**. Nazwa widoczna: **„Explorer"**.
 - Systemowy Thunar (`/usr/bin/thunar`) i jego konfiguracja muszą pozostać nietknięte; obie aplikacje muszą dać się uruchomić równolegle.
@@ -123,7 +123,7 @@ git commit -m "build: skrypt meson buildujący Thunara do lokalnego install/"
 
 ---
 
-### Task 3: Osobny identyfikator aplikacji/D-Bus (`eu.mizak.Explorer`)
+### Task 3: Osobny identyfikator aplikacji/D-Bus (`io.github.quzopl.Explorer`)
 
 To najważniejsze zadanie Etapu 1: bez zmiany app-id nasz binar pod single-instance „dogada się" z działającym systemowym demonem Thunara zamiast być osobną aplikacją.
 
@@ -133,7 +133,7 @@ To najważniejsze zadanie Etapu 1: bez zmiany app-id nasz binar pod single-insta
 
 **Interfaces:**
 - Consumes: drzewo `thunar-src/` zbudowane w Task 2.
-- Produces: `install/bin/thunar` z identyfikatorem aplikacji `eu.mizak.Explorer`.
+- Produces: `install/bin/thunar` z identyfikatorem aplikacji `io.github.quzopl.Explorer`.
 
 - [ ] **Step 1: Zlokalizuj identyfikator aplikacji i nazwy D-Bus**
 
@@ -145,9 +145,9 @@ Expected: znajdź miejsce, gdzie tworzony jest `GApplication`/`GtkApplication` z
 Run: `grep -rn "org.xfce.Thunar" thunar-src/thunar/thunar-application.c`
 Expected: znajduje wystąpienie(a) z `org.xfce.Thunar` jako application-id. (To „test, który ma wykazać stan początkowy".)
 
-- [ ] **Step 3: Zmień application-id na `eu.mizak.Explorer`**
+- [ ] **Step 3: Zmień application-id na `io.github.quzopl.Explorer`**
 
-W pliku/plikach z application-id (najpewniej `thunar-src/thunar/thunar-application.c`) zmień ciąg `"org.xfce.Thunar"` użyty jako **application-id** na `"eu.mizak.Explorer"`. NIE zmieniaj na tym etapie wewnętrznych ścieżek obiektów D-Bus współdzielonej usługi menedżera plików (`org.xfce.FileManager`), jeśli służą integracji — zmieniamy wyłącznie unikatową nazwę instancji (application-id), aby uzyskać osobny single-instance.
+W pliku/plikach z application-id (najpewniej `thunar-src/thunar/thunar-application.c`) zmień ciąg `"org.xfce.Thunar"` użyty jako **application-id** na `"io.github.quzopl.Explorer"`. NIE zmieniaj na tym etapie wewnętrznych ścieżek obiektów D-Bus współdzielonej usługi menedżera plików (`org.xfce.FileManager`), jeśli służą integracji — zmieniamy wyłącznie unikatową nazwę instancji (application-id), aby uzyskać osobny single-instance.
 
 - [ ] **Step 4: Przebuduj**
 
@@ -164,16 +164,16 @@ sleep 1
 timeout 6 ./install/bin/thunar /tmp & MYPID=$!
 sleep 2
 # nasza instancja ma własną nazwę na magistrali:
-busctl --user list | grep -i "eu.mizak.Explorer" && echo "OSOBNA INSTANCJA OK"
+busctl --user list | grep -i "io.github.quzopl.Explorer" && echo "OSOBNA INSTANCJA OK"
 wait $MYPID 2>/dev/null; echo "done"
 ```
-Expected: linia z `eu.mizak.Explorer` na magistrali sesyjnej → `OSOBNA INSTANCJA OK`. Systemowy `thunar` nie został zamknięty ani przejął okna.
+Expected: linia z `io.github.quzopl.Explorer` na magistrali sesyjnej → `OSOBNA INSTANCJA OK`. Systemowy `thunar` nie został zamknięty ani przejął okna.
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add thunar-src
-git commit -m "feat: osobny application-id eu.mizak.Explorer (instancja niezależna od systemowego Thunara)"
+git commit -m "feat: osobny application-id io.github.quzopl.Explorer (instancja niezależna od systemowego Thunara)"
 ```
 
 Uwaga: `thunar-src/` jest w `.gitignore`, więc commit źródeł wymaga `git add -f thunar-src` LUB usunięcia `thunar-src/` z `.gitignore` na rzecz patcha. **Decyzja:** zamiast commitować całe drzewo, zapiszemy zmianę jako **patch** — patrz Step 7.
@@ -189,7 +189,7 @@ mkdir -p patches
 git -C .. add patches/01-app-id.patch
 ```
 
-Run: `git add patches/01-app-id.patch && git commit -m "feat: patch — osobny application-id eu.mizak.Explorer"`
+Run: `git add patches/01-app-id.patch && git commit -m "feat: patch — osobny application-id io.github.quzopl.Explorer"`
 Expected: patch zacommitowany; `thunar-src/` pozostaje ignorowane. (Patch będzie odtwarzalny po `fetch-sources.sh`.)
 
 ---
@@ -341,7 +341,7 @@ echo "== 2. systemowy thunar nietknięty =="
 echo "== 3. osobny app-id na magistrali =="
 timeout 6 ./install/bin/explorer /tmp >/dev/null 2>&1 &
 sleep 2
-busctl --user list 2>/dev/null | grep -q "eu.mizak.Explorer" && echo "app-id OK" || { echo "BRAK app-id"; fail=1; }
+busctl --user list 2>/dev/null | grep -q "io.github.quzopl.Explorer" && echo "app-id OK" || { echo "BRAK app-id"; fail=1; }
 echo "== 4. osobny kanał xfconf =="
 xfconf-query -c explorer -l >/dev/null 2>&1 && echo "kanal OK" || echo "(kanal jeszcze pusty — OK jeśli brak zapisów)"
 [ "$fail" = 0 ] && echo "ETAP 1: SUKCES" || echo "ETAP 1: SĄ BŁĘDY"
@@ -351,7 +351,7 @@ exit $fail
 - [ ] **Step 2: Uruchom weryfikację**
 
 Run: `bash scripts/verify-etap1.sh`
-Expected: `ETAP 1: SUKCES`, kod wyjścia 0; systemowy thunar wypisuje swoją wersję (nietknięty), nasz `explorer` ma osobny app-id `eu.mizak.Explorer`.
+Expected: `ETAP 1: SUKCES`, kod wyjścia 0; systemowy thunar wypisuje swoją wersję (nietknięty), nasz `explorer` ma osobny app-id `io.github.quzopl.Explorer`.
 
 - [ ] **Step 3: Commit**
 
@@ -373,6 +373,6 @@ git commit -m "test: skrypt weryfikacyjny definicji sukcesu Etapu 1"
 
 **Placeholdery:** kroki, które zależą od struktury źródeł (dokładny plik z app-id, nazwa kanału), zawierają konkretne komendy `grep` do zlokalizowania miejsca przed zmianą — to świadoma „discovery", nie placeholder. Patche generowane z kopii `.orig`.
 
-**Spójność typów/nazw:** `eu.mizak.Explorer` i kanał `explorer` użyte spójnie w Task 3, 4 i 6. Binarka `explorer` spójnie w Task 5 i 6.
+**Spójność typów/nazw:** `io.github.quzopl.Explorer` i kanał `explorer` użyte spójnie w Task 3, 4 i 6. Binarka `explorer` spójnie w Task 5 i 6.
 
 **Uwaga o commitowaniu źródeł:** `thunar-src/` jest ignorowane; zmiany w C utrwalamy jako patche w `patches/` (odtwarzalne po `fetch-sources.sh`), nie jako commit całego drzewa.

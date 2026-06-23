@@ -91,7 +91,7 @@ Każdy etap = osobny spec → plan → implementacja.
    start.
 5. **Odbrandowanie (kluczowe dla "obok systemowego"):**
    - nazwa binarki `thunar` → `explorer`,
-   - identyfikator aplikacji / nazwa D-Bus `org.xfce.Thunar` → `eu.mizak.Explorer`
+   - identyfikator aplikacji / nazwa D-Bus `org.xfce.Thunar` → `io.github.quzopl.Explorer`
      (bez tego nasz "explorer" rozmawiałby z działającym demonem systemowego
      Thunara zamiast być osobną instancją),
    - własny plik `.desktop` ("Explorer") + osobna ikona,

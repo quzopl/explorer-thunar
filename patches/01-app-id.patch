@@ -5,7 +5,7 @@
      return THUNAR_APPLICATION (g_object_ref (default_app));
    else
 -    return g_object_ref_sink (g_object_new (THUNAR_TYPE_APPLICATION, "application-id", "org.xfce.Thunar", NULL));
-+    return g_object_ref_sink (g_object_new (THUNAR_TYPE_APPLICATION, "application-id", "eu.mizak.Explorer", NULL));
++    return g_object_ref_sink (g_object_new (THUNAR_TYPE_APPLICATION, "application-id", "io.github.quzopl.Explorer", NULL));
  }
  
  

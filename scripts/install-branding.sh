@@ -5,7 +5,7 @@ PREFIX="$PWD/install"
 # binarka explorer = dowiązanie do zbudowanego thunar
 ln -sf thunar "$PREFIX/bin/explorer"
 # plik .desktop (w prefiksie + w ~/.local/share/applications jako nazwa app-id,
-# żeby KDE skojarzyło okno (app_id eu.mizak.Explorer) z wpisem -> pasek zadań/ikona)
+# żeby KDE skojarzyło okno (app_id io.github.quzopl.Explorer) z wpisem -> pasek zadań/ikona)
 # Exec generujemy z aktualnego $PREFIX — wpis działa niezależnie od tego, gdzie
 # leży repo (koniec zaszytych na sztywno ścieżek typu /mnt/swiezak/...).
 mkdir -p "$PREFIX/share/applications"
@@ -15,7 +15,7 @@ install -m644 "$DESKTOP_TMP" "$PREFIX/share/applications/explorer.desktop"
 # nazwa pliku musi odpowiadać app_id okna (GTK3/Wayland: prgname = "explorer")
 USER_APPS="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
 mkdir -p "$USER_APPS"
-rm -f "$USER_APPS/eu.mizak.Explorer.desktop"   # poprzednia, błędna nazwa
+rm -f "$USER_APPS/io.github.quzopl.Explorer.desktop"   # poprzednia, błędna nazwa
 install -m644 "$DESKTOP_TMP" "$USER_APPS/explorer.desktop"
 rm -f "$DESKTOP_TMP"
 update-desktop-database "$USER_APPS" 2>/dev/null || true

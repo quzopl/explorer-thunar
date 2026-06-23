@@ -15,10 +15,14 @@ in Dark and Light), switchable live. A few of them:
 | **Aurora · Light** | **Porcelain · Light** |
 | ![Aurora Light](docs/screenshots/03-aurora-light.png) | ![Porcelain Light](docs/screenshots/04-porcelain-light.png) |
 
-Every screenshot shows the same window: an always-visible **Search** box (top
+Each image shows the same window: an always-visible **Search** box (top
 right), the **view switchers** (icons / details / compact) in the toolbar, a
 Windows-style **Places / Devices / Network** sidebar with all disks, and an
 English UI regardless of system locale.
+
+> The images above are representative **mockups** generated on sample data
+> (`scripts/gen-mockups.py`) — no personal files. To capture real screenshots
+> from the running app, use `scripts/gen-screenshots.sh`.
 
 ## Features
 
@@ -37,7 +41,7 @@ English UI regardless of system locale.
 - **Terminal:** right-click in a folder → "Open Terminal Here" launches `konsole`.
 - **All drives:** `scripts/enable-gvfs-drives.sh` (sudo) adds `x-gvfs-show` to
   `/mnt/*` fstab entries so every disk appears under "Devices".
-- **Isolation:** its own application id `eu.mizak.Explorer` and its own Xfconf
+- **Isolation:** its own application id `io.github.quzopl.Explorer` and its own Xfconf
   settings channel `explorer`.
 
 ## Building from scratch

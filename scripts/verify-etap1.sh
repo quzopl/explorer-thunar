@@ -11,7 +11,7 @@ timeout 9 ./install/bin/explorer /tmp >/dev/null 2>&1 &
 MYPID=$!
 found=0
 for _ in 1 2 3 4 5 6 7; do
-  if busctl --user list 2>/dev/null | grep -q "eu.mizak.Explorer"; then found=1; break; fi
+  if busctl --user list 2>/dev/null | grep -q "io.github.quzopl.Explorer"; then found=1; break; fi
   kill -0 $MYPID 2>/dev/null || break
   sleep 1
 done
