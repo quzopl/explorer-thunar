@@ -22,4 +22,15 @@ update-desktop-database "$USER_APPS" 2>/dev/null || true
 # palety motywów (8 palet; bazowy explorer.css nie jest już używany od patcha 12)
 mkdir -p "$PREFIX/share/explorer/themes"
 install -m644 branding/themes/*.css "$PREFIX/share/explorer/themes/"
+
+# „Open Terminal Here": Thunar NIE nadpisuje istniejącego ~/.config/Thunar/uca.xml
+# naszym szablonem, więc starsza konfiguracja użytkownika nadal woła
+# `exo-open --launch TerminalEmulator` (pada, gdy exo nie ma terminala).
+# Napraw to bezpiecznie i idempotentnie -> konsole.
+UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
+if [ -f "$UCA" ] && grep -q 'exo-open --working-directory %f --launch TerminalEmulator' "$UCA"; then
+  cp "$UCA" "$UCA.bak.$(date +%s)"
+  sed -i 's#<command>exo-open --working-directory %f --launch TerminalEmulator</command>#<command>konsole --workdir %f</command>#' "$UCA"
+  echo "OK: naprawiono akcję terminala w $UCA (-> konsole)"
+fi
 echo "OK: branding zainstalowany"
