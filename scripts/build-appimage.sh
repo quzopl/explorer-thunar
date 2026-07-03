@@ -18,6 +18,9 @@ export PATH="/tmp:$PATH"
 # --disable-introspection: bez tego build pada na 'Thunarx-3.0.typelib'
 cd thunar-src
 ./configure --prefix=/usr --disable-static --disable-introspection
+# pełne przebudowanie: po zmianie prefiksu stare obiekty mają zapieczone
+# poprzednie ścieżki (DATADIR itd.)
+make clean >/dev/null 2>&1 || true
 make -j"$(nproc)"
 make install DESTDIR="$AD"
 cd "$ROOT"
@@ -34,6 +37,9 @@ mkdir -p "$AD/usr/share/icons/hicolor/scalable/apps"
 install -m644 branding/explorer.svg "$AD/usr/share/icons/hicolor/scalable/apps/explorer.svg"
 
 # 4. linuxdeploy + plugin gtk (NO_STRIP: stary strip nie zna .relr.dyn z Arch)
+# libthunarx buduje się razem z Thunarem i leży tylko w AppDir — wskaż ją
+# linuxdeployowi (bez systemowego Thunara nie ma jej skąd wziąć)
+export LD_LIBRARY_PATH="$AD/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export DEPLOY_GTK_VERSION=3 NO_STRIP=1 OUTPUT=Explorer-x86_64.AppImage
 linuxdeploy --appdir "$AD" \
   --executable "$AD/usr/bin/thunar" \
