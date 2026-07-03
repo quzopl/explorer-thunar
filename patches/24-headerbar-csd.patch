@@ -1,0 +1,11 @@
+--- thunar/thunar-preferences.c.t24	2026-07-03 08:59:01.506439953 +0000
++++ thunar/thunar-preferences.c	2026-07-03 08:59:01.544440132 +0000
+@@ -1394,7 +1394,7 @@
+   g_param_spec_boolean ("misc-use-csd",
+                         "MiscUseCSD",
+                         NULL,
+-                        FALSE,
++                        TRUE,
+                         EXO_PARAM_READWRITE);
+ 
+   /* install all properties */

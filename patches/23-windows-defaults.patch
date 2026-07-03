@@ -1,0 +1,38 @@
+--- thunar/thunar-preferences.c.t23	2026-07-03 08:58:26.947277452 +0000
++++ thunar/thunar-preferences.c	2026-07-03 08:58:39.357335850 +0000
+@@ -414,7 +414,7 @@
+   g_param_spec_string ("last-location-bar",
+                        "LastLocationBar",
+                        NULL,
+-                       "ThunarLocationEntry",
++                       "ThunarLocationButtons",
+                        EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -673,7 +673,7 @@
+                        NULL,
+                        "menu:0,back:1,forward:1,open-parent:1,open-home:1,"
+                        "new-tab:0,new-window:0,toggle-split-view:0,"
+-                       "undo:0,redo:0,zoom-out:0,zoom-in:0,zoom-reset:0,"
++                       "undo:1,redo:1,zoom-out:0,zoom-in:0,zoom-reset:0,"
+                        "view-as-icons:1,view-as-detailed-list:1,view-as-compact-list:1,view-switcher:0,"
+                        "location-bar:1,reload:0,search:1,explorer-search:1",
+                        EXO_PARAM_READWRITE);
+@@ -858,7 +858,7 @@
+   g_param_spec_boolean ("misc-open-new-window-as-tab",
+                         "MiscOpenNewWindowAsTab",
+                         NULL,
+-                        FALSE,
++                        TRUE,
+                         EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -1109,7 +1109,7 @@
+                      "MiscImagePreviewMode",
+                      NULL,
+                      THUNAR_TYPE_IMAGE_PREVIEW_MODE,
+-                     THUNAR_IMAGE_PREVIEW_MODE_EMBEDDED,
++                     THUNAR_IMAGE_PREVIEW_MODE_STANDALONE,
+                      EXO_PARAM_READWRITE);
+ 
+   /**

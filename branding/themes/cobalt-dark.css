@@ -56,6 +56,53 @@ scrollbar slider { background-color: #21385f; border-radius: 6px; min-width: 8px
 scrollbar slider:hover { background-color: #2e4d7e; }
 
 paned > separator { background-color: #1c3358; }
+/* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
+ * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
 notebook, notebook header { background-color: #101f3a; border-color: #1c3358; }
-notebook tab { background-color: #070e1c; color: #92a3c2; padding: 4px 10px; }
+notebook tab { background-color: transparent; color: #92a3c2; padding: 4px 10px;
+  border: none; }
+notebook tab:hover { background-color: #152844; }
 notebook tab:checked { background-color: rgba(61,123,255,.26); color: #e6eefc; }
+
+/* tooltipy — bez tego tekst dziedziczy kolor z motywu aplikacji, a tło
+ * z motywu systemowego: bywa ciemne na ciemnym */
+tooltip.background, tooltip { background-color: #101f3a; color: #e6eefc;
+  border: 1px solid #1c3358; border-radius: 5px; }
+tooltip label { color: #e6eefc; }
+
+/* pasek zajętości dysku (Właściwości dysku -> Usage) */
+levelbar trough { background-color: #0a1730; border: 1px solid #21385f;
+  border-radius: 4px; }
+levelbar block.filled { background-color: #3d7bff; border-radius: 4px; }
+levelbar block.empty { background-color: transparent; }
+
+/* wnętrza dialogów (Właściwości itd.) — motyw systemowy maluje stronę
+ * notebooka (notebook > stack) własnym kolorem bazowym (np. białym),
+ * a nasze etykiety dziedziczą jasny tekst -> nieczytelne. Kryjemy całość. */
+notebook > stack { background-color: #101f3a; color: #e6eefc; }
+frame > border { border-color: #1c3358; }
+combobox cellview, combobox label { color: #e6eefc; }
+textview, textview text { background-color: #0a1730; color: #e6eefc; }
+
+/* dialog postępu kopiowania/przenoszenia — bez tego pasek postępu
+ * dziedziczy wygląd z motywu systemowego i gryzie się z paletą */
+progressbar trough { background-color: #0a1730; border: 1px solid #21385f;
+  border-radius: 4px; min-height: 8px; }
+progressbar progress { background-color: #3d7bff; border: none; border-radius: 4px; min-height: 8px; }
+
+/* headerbar CSD (belka tytułu po stronie aplikacji, jak w Windows 11).
+ * Selektory z klasą .titlebar i :backdrop muszą być co najmniej tak
+ * specyficzne jak w motywie systemowym (Adwaita/Breeze stylują
+ * ".titlebar:backdrop"), inaczej nieaktywne okno dostaje jasny pas. */
+headerbar, .titlebar, headerbar.titlebar { background-color: #101f3a;
+  background-image: none; box-shadow: none; color: #e6eefc; border: none;
+  border-bottom: 1px solid #1c3358; min-height: 40px; padding: 2px 6px; }
+headerbar:backdrop, .titlebar:backdrop, headerbar.titlebar:backdrop {
+  background-color: #101f3a; background-image: none; color: #92a3c2; }
+headerbar button.titlebutton, .titlebar button.titlebutton {
+  background-color: transparent; background-image: none; box-shadow: none;
+  color: #e6eefc; border-radius: 5px; padding: 4px; min-width: 24px; min-height: 24px; }
+headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover {
+  background-color: #152844; }
+headerbar button.titlebutton:backdrop, .titlebar button.titlebutton:backdrop {
+  color: #92a3c2; }
