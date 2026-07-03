@@ -65,6 +65,12 @@ if ! grep -q GIO_MODULE_DIR "$HOOK"; then
   printf '\nexport GIO_MODULE_DIR="$APPDIR/usr/lib/gio/modules" # gvfs hosta przez D-Bus\n' >> "$HOOK"
 fi
 
+# RUNPATH modułów wskazuje ścieżki dystrybucji builda (np.
+# /usr/lib/x86_64-linux-gnu/gvfs), których nie ma na innych distro — wtedy
+# dlopen modułu pada po cichu (libgvfscommon nieznajdowalna) i gvfs znika.
+# Przestaw na bundlowane usr/lib.
+patchelf --set-rpath '$ORIGIN/../..' "$AD"/usr/lib/gio/modules/*.so
+
 # faza 2: spakuj AppImage
 linuxdeploy --appdir "$AD" --output appimage
 mkdir -p dist && mv -f Explorer-x86_64.AppImage dist/

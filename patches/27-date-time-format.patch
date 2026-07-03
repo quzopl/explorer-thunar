@@ -1,0 +1,20 @@
+--- thunar/thunar-preferences.c.t27	2026-07-03 19:10:18.429377073 +0000
++++ thunar/thunar-preferences.c	2026-07-03 19:10:18.473377262 +0000
+@@ -725,7 +725,7 @@
+                      "MiscDateStyle",
+                      NULL,
+                      THUNAR_TYPE_DATE_STYLE,
+-                     THUNAR_DATE_STYLE_SIMPLE,
++                     THUNAR_DATE_STYLE_CUSTOM,
+                      EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -737,7 +737,7 @@
+   g_param_spec_string ("misc-date-custom-style",
+                        "MiscDateCustomStyle",
+                        NULL,
+-                       "%Y-%m-%d %H:%M:%S",
++                       "%d.%m.%Y %H:%M",
+                        EXO_PARAM_READWRITE);
+ 
+   /**
