@@ -29,15 +29,16 @@ ln -sf thunar "$AD/usr/bin/explorer"
 sed 's/^Exec=.*/Exec=explorer %F/; s/^Icon=.*/Icon=explorer/' \
     branding/explorer.desktop > "$AD/usr/share/applications/explorer.desktop"
 
-# 3. ikona
-cp /usr/share/icons/breeze/apps/64/system-file-manager.svg /tmp/explorer.svg
+# 3. ikona — własna z brandingu (bez zależności od zainstalowanego breeze)
+mkdir -p "$AD/usr/share/icons/hicolor/scalable/apps"
+install -m644 branding/explorer.svg "$AD/usr/share/icons/hicolor/scalable/apps/explorer.svg"
 
 # 4. linuxdeploy + plugin gtk (NO_STRIP: stary strip nie zna .relr.dyn z Arch)
 export DEPLOY_GTK_VERSION=3 NO_STRIP=1 OUTPUT=Explorer-x86_64.AppImage
 linuxdeploy --appdir "$AD" \
   --executable "$AD/usr/bin/thunar" \
   --desktop-file "$AD/usr/share/applications/explorer.desktop" \
-  --icon-file /tmp/explorer.svg \
+  --icon-file branding/explorer.svg \
   --plugin gtk --output appimage
 mkdir -p dist && mv -f Explorer-x86_64.AppImage dist/
 echo "OK: dist/Explorer-x86_64.AppImage"

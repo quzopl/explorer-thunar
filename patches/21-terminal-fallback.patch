@@ -1,0 +1,11 @@
+--- plugins/thunar-uca/uca.xml.in.t21	2026-07-03 09:03:38.445730578 +0000
++++ plugins/thunar-uca/uca.xml.in	2026-07-03 09:03:38.444730574 +0000
+@@ -40,7 +40,7 @@
+     <patterns>*</patterns>
+     <range></range>
+     <name>Open Terminal Here</name>
+-    <command>konsole --workdir %f</command>
++    <command>d=%f; if command -v konsole >/dev/null; then exec konsole --workdir "$d"; elif command -v xfce4-terminal >/dev/null; then exec xfce4-terminal --working-directory "$d"; elif command -v gnome-terminal >/dev/null; then exec gnome-terminal --working-directory="$d"; elif command -v x-terminal-emulator >/dev/null; then cd "$d"; exec x-terminal-emulator; else cd "$d"; exec xterm; fi</command>
+     <description>Open a terminal in the current folder</description>
+     <startup-notify/>
+     <directories/>

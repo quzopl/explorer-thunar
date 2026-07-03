@@ -1,0 +1,11 @@
+--- thunar/thunar-window.c.t22	2026-07-03 08:58:04.345170961 +0000
++++ thunar/thunar-window.c	2026-07-03 08:58:12.840211006 +0000
+@@ -6812,8 +6812,6 @@
+   /* setup the toolbar for the location bar */
+   window->location_toolbar = gtk_toolbar_new ();
+   gtk_toolbar_set_style (GTK_TOOLBAR (window->location_toolbar), GTK_TOOLBAR_ICONS);
+-  /* Explorer: nie chowaj elementów (np. pola wyszukiwania) do menu przepełnienia */
+-  gtk_toolbar_set_show_arrow (GTK_TOOLBAR (window->location_toolbar), FALSE);
+   gtk_toolbar_set_icon_size (GTK_TOOLBAR (window->location_toolbar),
+                              small_icons ? GTK_ICON_SIZE_SMALL_TOOLBAR : GTK_ICON_SIZE_LARGE_TOOLBAR);
+   gtk_widget_set_hexpand (window->location_toolbar, TRUE);

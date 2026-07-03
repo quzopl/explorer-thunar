@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f5b955"/>
+      <stop offset="1" stop-color="#e8960f"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd977"/>
+      <stop offset="1" stop-color="#fdb827"/>
+    </linearGradient>
+  </defs>
+  <!-- tylna część folderu z zakładką -->
+  <path fill="url(#back)" d="M6 14c0-2.2 1.8-4 4-4h14l6 6h24c2.2 0 4 1.8 4 4v30c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V14z"/>
+  <!-- przednia klapka -->
+  <path fill="url(#front)" d="M6 24h52v26c0 2.2-1.8 4-4 4H10c-2.2 0-4-1.8-4-4V24z"/>
+  <path fill="#ffffff" fill-opacity=".25" d="M6 24h52v3H6z"/>
+</svg>

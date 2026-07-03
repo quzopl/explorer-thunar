@@ -1,0 +1,74 @@
+--- thunar/thunar-application.c.t20	2026-07-03 08:56:23.955695707 +0000
++++ thunar/thunar-application.c	2026-07-03 08:57:07.506902360 +0000
+@@ -700,26 +700,34 @@
+ static gboolean
+ explorer_icon_theme_exists (const gchar *name)
+ {
+-  gchar       *user_icons = g_build_filename (g_get_user_data_dir (), "icons", NULL);
+-  gchar       *home_icons = g_build_filename (g_get_home_dir (), ".icons", NULL);
+-  const gchar *dirs[] = { user_icons, home_icons, "/usr/share/icons" };
+-  gboolean     found = FALSE;
+-  guint        i;
++  const gchar *const *data_dirs = g_get_system_data_dirs ();
++  const gchar        *appdir = g_getenv ("APPDIR");
++  GPtrArray          *dirs = g_ptr_array_new_with_free_func (g_free);
++  gboolean            found = FALSE;
++  guint               i;
++
++  g_ptr_array_add (dirs, g_build_filename (g_get_user_data_dir (), "icons", NULL));
++  g_ptr_array_add (dirs, g_build_filename (g_get_home_dir (), ".icons", NULL));
++  for (i = 0; data_dirs != NULL && data_dirs[i] != NULL; i++)
++    g_ptr_array_add (dirs, g_build_filename (data_dirs[i], "icons", NULL));
++  if (appdir != NULL && *appdir != '\0')
++    g_ptr_array_add (dirs, g_build_filename (appdir, "usr", "share", "icons", NULL));
+ 
+-  for (i = 0; i < G_N_ELEMENTS (dirs) && !found; i++)
++  for (i = 0; i < dirs->len && !found; i++)
+     {
+-      gchar *idx = g_build_filename (dirs[i], name, "index.theme", NULL);
++      gchar *idx = g_build_filename (g_ptr_array_index (dirs, i), name, "index.theme", NULL);
+       found = g_file_test (idx, G_FILE_TEST_EXISTS);
+       g_free (idx);
+     }
+ 
+-  g_free (user_icons);
+-  g_free (home_icons);
++  g_ptr_array_free (dirs, TRUE);
+   return found;
+ }
+ 
+ /* Explorer: wybierz motyw ikon — najpierw Win11 (jeśli jest), potem sensowny
+- * zainstalowany fallback, by ikony zawsze były spójne z jasnym/ciemnym UI. */
++ * zainstalowany fallback, by ikony zawsze były spójne z jasnym/ciemnym UI.
++ * NULL = nic z listy nie jest zainstalowane; wtedy NIE wymuszamy nazwy
++ * (zostaje motyw systemowy zamiast nieistniejącego -> gołego hicolor). */
+ static const gchar *
+ explorer_pick_icon_theme (gboolean dark)
+ {
+@@ -732,7 +740,7 @@
+     if (explorer_icon_theme_exists (pref[i]))
+       return pref[i];
+ 
+-  return dark ? "breeze-dark" : "breeze";
++  return NULL;
+ }
+ 
+ void
+@@ -751,10 +759,13 @@
+ 
+   settings = gtk_settings_get_default ();
+   if (settings != NULL)
+-    g_object_set (settings,
+-                  "gtk-application-prefer-dark-theme", dark,
+-                  "gtk-icon-theme-name", explorer_pick_icon_theme (dark),
+-                  NULL);
++    {
++      const gchar *icon_theme = explorer_pick_icon_theme (dark);
++
++      g_object_set (settings, "gtk-application-prefer-dark-theme", dark, NULL);
++      if (icon_theme != NULL)
++        g_object_set (settings, "gtk-icon-theme-name", icon_theme, NULL);
++    }
+ 
+   if (explorer_theme_provider == NULL)
+     {
