@@ -1,0 +1,233 @@
+--- thunar/thunar-menu.h.t25	2026-07-03 09:37:55.218998337 +0000
++++ thunar/thunar-menu.h	2026-07-03 09:38:46.017250070 +0000
+@@ -65,6 +65,8 @@
+   THUNAR_MENU_SECTION_ZOOM = 1 << 13,
+   THUNAR_MENU_SECTION_PROPERTIES = 1 << 14,
+   THUNAR_MENU_SECTION_MOUNTABLE = 1 << 15,
++  /* Explorer: etykiety kolorów (jak w Finderze) */
++  THUNAR_MENU_SECTION_COLOR_LABEL = 1 << 16,
+ } ThunarMenuSections;
+ 
+ 
+--- thunar/thunar-menu.c.t25	2026-07-03 09:37:55.216998327 +0000
++++ thunar/thunar-menu.c	2026-07-03 09:39:45.051541301 +0000
+@@ -20,11 +20,16 @@
+ #endif
+ 
+ #include "thunar/thunar-action-manager.h"
++#include "thunar/thunar-gio-extensions.h"
+ #include "thunar/thunar-gtk-extensions.h"
++#include "thunar/thunar-io-jobs.h"
+ #include "thunar/thunar-menu.h"
++#include "thunar/thunar-preferences.h"
+ #include "thunar/thunar-private.h"
+ #include "thunar/thunar-window.h"
+ 
++#include <libxfce4util/libxfce4util.h>
++
+ 
+ 
+ /**
+@@ -234,6 +239,138 @@
+ 
+ 
+ 
++/* Explorer: etykiety kolorów jak w Finderze — zapisują wbudowane w Thunara
++ * podświetlenie pliku (metadane gvfs thunar-highlight-color-*), rysowane
++ * przez widoki, gdy misc-highlighting-enabled. */
++typedef struct
++{
++  const gchar *label;
++  const gchar *background;
++  const gchar *foreground;
++} ThunarExplorerColorLabel;
++
++static const ThunarExplorerColorLabel thunar_explorer_color_labels[] = {
++  { N_ ("Red"), "#c94f4f", "#ffffff" },
++  { N_ ("Orange"), "#cf7f2e", "#ffffff" },
++  { N_ ("Yellow"), "#c9a800", "#1a1a1a" },
++  { N_ ("Green"), "#3f9a50", "#ffffff" },
++  { N_ ("Blue"), "#3a76c4", "#ffffff" },
++  { N_ ("Purple"), "#8b5fbf", "#ffffff" },
++  { N_ ("Gray"), "#7a7d85", "#ffffff" },
++};
++
++
++
++static void
++thunar_menu_explorer_color_label_files_free (gpointer data)
++{
++  thunar_g_list_free_full ((GList *) data);
++}
++
++
++
++static void
++thunar_menu_explorer_color_label_activate (GtkWidget *item,
++                                           gpointer   user_data)
++{
++  GList             *files;
++  const gchar       *bg;
++  const gchar       *fg;
++  ThunarJob         *job;
++  ThunarPreferences *preferences;
++
++  files = g_object_get_data (G_OBJECT (item), "explorer-color-label-files");
++  if (files == NULL)
++    return;
++
++  bg = g_object_get_data (G_OBJECT (item), "explorer-color-label-bg");
++  fg = g_object_get_data (G_OBJECT (item), "explorer-color-label-fg");
++
++  if (bg != NULL)
++    {
++      /* jak dialog Właściwości: nadanie etykiety włącza rysowanie podświetleń */
++      preferences = thunar_preferences_get ();
++      g_object_set (G_OBJECT (preferences), "misc-highlighting-enabled", TRUE, NULL);
++      g_object_unref (preferences);
++
++      job = thunar_io_jobs_set_metadata_for_files (files, THUNAR_GTYPE_STRING,
++                                                   "thunar-highlight-color-background", bg,
++                                                   "thunar-highlight-color-foreground", fg,
++                                                   NULL);
++    }
++  else
++    {
++      job = thunar_io_jobs_clear_metadata_for_files (files,
++                                                     "thunar-highlight-color-background",
++                                                     "thunar-highlight-color-foreground",
++                                                     NULL);
++    }
++
++  /* zwolnij nasz ref po zakończeniu zadania */
++  g_signal_connect_swapped (job, "finished", G_CALLBACK (g_object_unref), job);
++  exo_job_launch (EXO_JOB (job));
++}
++
++
++
++static gboolean
++thunar_menu_explorer_append_color_labels (ThunarMenu *menu)
++{
++  GList     *selected_files = NULL;
++  GtkWidget *item;
++  GtkWidget *submenu;
++  GtkWidget *child;
++  GtkWidget *label;
++  gchar     *markup;
++  guint      i;
++
++  g_object_get (G_OBJECT (menu->action_mgr), "selected-files", &selected_files, NULL);
++  if (selected_files == NULL)
++    return FALSE;
++
++  item = gtk_menu_item_new_with_mnemonic (_("Color _Label"));
++  submenu = gtk_menu_new ();
++  gtk_menu_item_set_submenu (GTK_MENU_ITEM (item), submenu);
++
++  /* pozycje kolorów + oddzielone "None" czyszczące etykietę */
++  for (i = 0; i <= G_N_ELEMENTS (thunar_explorer_color_labels); i++)
++    {
++      gboolean     is_clear = (i == G_N_ELEMENTS (thunar_explorer_color_labels));
++      const gchar *bg = is_clear ? NULL : thunar_explorer_color_labels[i].background;
++
++      if (is_clear)
++        gtk_menu_shell_append (GTK_MENU_SHELL (submenu), gtk_separator_menu_item_new ());
++
++      child = gtk_menu_item_new ();
++      label = gtk_label_new (NULL);
++      if (is_clear)
++        markup = g_strdup_printf ("\xe2\x97\x8b  %s", _("None"));
++      else
++        markup = g_strdup_printf ("<span foreground=\"%s\">\xe2\x97\x8f</span>  %s",
++                                  bg, _(thunar_explorer_color_labels[i].label));
++      gtk_label_set_markup (GTK_LABEL (label), markup);
++      gtk_label_set_xalign (GTK_LABEL (label), 0.0f);
++      g_free (markup);
++      gtk_container_add (GTK_CONTAINER (child), label);
++
++      g_object_set_data_full (G_OBJECT (child), "explorer-color-label-files",
++                              thunar_g_list_copy_deep (selected_files),
++                              thunar_menu_explorer_color_label_files_free);
++      g_object_set_data (G_OBJECT (child), "explorer-color-label-bg", (gpointer) bg);
++      g_object_set_data (G_OBJECT (child), "explorer-color-label-fg",
++                         is_clear ? NULL : (gpointer) thunar_explorer_color_labels[i].foreground);
++      g_signal_connect (child, "activate",
++                        G_CALLBACK (thunar_menu_explorer_color_label_activate), NULL);
++      gtk_menu_shell_append (GTK_MENU_SHELL (submenu), child);
++    }
++
++  thunar_g_list_free_full (selected_files);
++  gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
++  return TRUE;
++}
++
++
++
+ /**
+  * thunar_menu_add_sections:
+  * @menu : a #ThunarMenu instance
+@@ -358,6 +495,12 @@
+         }
+     }
+ 
++  if (menu_sections & THUNAR_MENU_SECTION_COLOR_LABEL)
++    {
++      if (thunar_menu_explorer_append_color_labels (menu))
++        xfce_gtk_menu_append_separator (GTK_MENU_SHELL (menu));
++    }
++
+   if (menu_sections & THUNAR_MENU_SECTION_PROPERTIES)
+     thunar_action_manager_append_menu_item (menu->action_mgr, GTK_MENU_SHELL (menu), THUNAR_ACTION_MANAGER_ACTION_PROPERTIES, FALSE);
+ 
+--- thunar/thunar-standard-view.c.t25	2026-07-03 09:37:55.224998367 +0000
++++ thunar/thunar-standard-view.c	2026-07-03 09:39:53.481582782 +0000
+@@ -4175,6 +4175,7 @@
+                                               | THUNAR_MENU_SECTION_RESTORE
+                                               | THUNAR_MENU_SECTION_REMOVE_FROM_RECENT
+                                               | THUNAR_MENU_SECTION_CUSTOM_ACTIONS
++                                              | THUNAR_MENU_SECTION_COLOR_LABEL
+                                               | THUNAR_MENU_SECTION_PROPERTIES);
+     }
+   else /* right click on some empty space */
+--- thunar/thunar-action-manager.c.t25	2026-07-03 09:43:14.001562819 +0000
++++ thunar/thunar-action-manager.c	2026-07-03 09:43:34.421662007 +0000
+@@ -138,6 +138,8 @@
+ static void
+ thunar_action_manager_set_selected_files (ThunarComponent *component,
+                                           GList           *selected_files);
++static GList *
++thunar_action_manager_get_selected_files (ThunarComponent *component);
+ static void
+ thunar_action_manager_execute_files (ThunarActionManager *action_mgr,
+                                      GList               *files,
+@@ -493,11 +495,28 @@
+ static void
+ thunar_action_manager_component_init (ThunarComponentIface *iface)
+ {
+-  iface->get_selected_files = NULL;
++  /* Explorer: getter potrzebny m.in. menu etykiet kolorów (g_object_get
++   * "selected-files" zwracał NULL, bo slot interfejsu był pusty) */
++  iface->get_selected_files = thunar_action_manager_get_selected_files;
+   iface->set_selected_files = thunar_action_manager_set_selected_files;
+ }
+ 
+ 
++
++static GList *
++thunar_action_manager_get_selected_files (ThunarComponent *component)
++{
++  ThunarActionManager *action_mgr = THUNAR_ACTION_MANAGER (component);
++
++  /* gdy brak zaznaczenia, files_to_process zawiera bieżący katalog —
++   * to nie jest "zaznaczenie", więc zgłaszamy pustą listę */
++  if (!action_mgr->files_are_selected)
++    return NULL;
++
++  return action_mgr->files_to_process;
++}
++
++
+ 
+ static void
+ thunar_action_manager_navigator_init (ThunarNavigatorIface *iface)

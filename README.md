@@ -37,9 +37,22 @@ English UI regardless of system locale.
   `tumbler`), folders first, double-click.
 - **Search:** an always-visible "Search" box at the top-right of the toolbar
   (like Windows) plus Thunar's native recursive search (also `Ctrl+F`).
+- **Windows-style chrome:** client-side header bar (CSD) with the menu in the
+  title bar, a breadcrumb path bar (click `Ctrl+L` to type a path), a right-hand
+  image **preview pane**, Undo/Redo toolbar buttons, and folders opening as
+  **tabs** in the existing window.
+- **Computer:** a "Computer" sidebar entry (`computer://`, needs `gvfs`) lists
+  all drives — the closest equivalent of Windows' "This PC".
+- **Color labels (Finder-style):** right-click selected files → **Color Label**
+  (Red/Orange/Yellow/Green/Blue/Purple/Gray, None to clear). Stored as gvfs
+  metadata (Thunar's file-highlight feature), rendered in every view.
+- **Quick preview:** `Ctrl+4` toggles the right-hand image preview pane (the
+  closest analogue of Finder's Gallery view; Ctrl+1/2/3 switch the views).
 - **Hidden files** shown by default. **Icons:** Win11-dark (light themes → Win11),
   with a graceful fallback to an installed theme (e.g. `breeze`) when absent.
-- **Terminal:** right-click in a folder → "Open Terminal Here" launches `konsole`.
+- **Terminal:** right-click in a folder → "Open Terminal Here" tries `konsole`,
+  then `xfce4-terminal`, `gnome-terminal`, `x-terminal-emulator`, `xterm` —
+  whichever is installed first.
 - **All drives:** `scripts/enable-gvfs-drives.sh` (sudo) adds `x-gvfs-show` to
   `/mnt/*` fstab entries so every disk appears under "Devices".
 - **Isolation:** its own application id `io.github.quzopl.Explorer` and its own Xfconf
@@ -56,13 +69,14 @@ libxfce4util exo xfconf gudev`), `gcc`, `make`, `patch`, `curl`, `tumbler`
 - `gvfs` + `gvfs-smb` — **required for network drives** (`smb://`, `sftp://`) and
   the "Network" sidebar entry; also removable-device mounting. Optional:
   `gvfs-mtp` (phones), `gvfs-nfs` (NFS).
-- `konsole` — used by the "Open Terminal Here" action.
+- any terminal emulator for "Open Terminal Here" (`konsole`, `xfce4-terminal`,
+  `gnome-terminal`, `x-terminal-emulator` or `xterm`).
 - a `Win11` / `Win11-dark` icon theme (optional) — for the Windows look; without
   it the app falls back to an installed theme (e.g. `breeze`).
 
 ```bash
 bash scripts/fetch-sources.sh     # download Thunar 4.20.8 into thunar-src/
-bash scripts/apply-patches.sh     # apply patches/01..19
+bash scripts/apply-patches.sh     # apply patches/01..26
 bash scripts/build.sh             # ./configure + make + make install -> install/
 bash scripts/install-branding.sh  # explorer binary, .desktop, icon, themes
 ```
@@ -84,6 +98,17 @@ Requires `linuxdeploy`, `linuxdeploy-plugin-gtk.sh` and `appimagetool` in `PATH`
 bash scripts/build-appimage.sh    # -> dist/Explorer-x86_64.AppImage
 ```
 
+### Upgrading an existing install
+
+Thunar persists `last-*` settings on exit, so an existing `explorer` Xfconf
+channel keeps the old toolbar/path-bar layout. To pick up the new defaults
+(breadcrumbs, Undo/Redo buttons, preview pane) reset them once:
+
+```bash
+xfconf-query -c explorer -p /last-toolbar-items -r
+xfconf-query -c explorer -p /last-location-bar -r
+```
+
 ## Verification
 
 ```bash
@@ -96,7 +121,8 @@ bash scripts/verify-etap3.sh   # toolbar search box
 
 - `thunar-src/` — Thunar sources (git-ignored; reproducible from the tarball).
 - `patches/` — every C change (reproducible after `fetch-sources.sh`).
-- `branding/` — `explorer.desktop`, `themes/*.css` (8 palettes).
+- `branding/` — `explorer.desktop`, `explorer.svg` (app icon), `themes/*.css`
+  (8 palettes).
 - `scripts/` — fetch, patch, build, branding, AppImage, drives, verification.
 - `docs/superpowers/` — design specs and implementation plans.
 
@@ -105,9 +131,10 @@ it up automatically.
 
 ## How it works
 
-All C changes live in `patches/01..19` and are applied on top of a pristine
+All C changes live in `patches/01..26` and are applied on top of a pristine
 Thunar 4.20.8 tree. Highlights: separate application id and Xfconf channel,
 forced dark Win11 CSS, default large icons + always-on thumbnails, an
 always-visible search entry wired to Thunar's native search, a theme switcher,
-hidden files on by default, a working "Open Terminal Here", and a forced English
-UI. The Thunar source tree itself is never committed.
+hidden files on by default, a working "Open Terminal Here" with a terminal
+fallback chain, a forced English UI, Windows-like defaults (breadcrumb path bar,
+preview pane, undo/redo buttons, open-as-tabs) and a CSD header bar. The Thunar source tree itself is never committed.
