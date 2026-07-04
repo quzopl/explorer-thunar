@@ -1,0 +1,22 @@
+--- thunar/thunar-application.c.t28	2026-07-04 10:45:24.382858748 +0000
++++ thunar/thunar-application.c	2026-07-04 10:45:50.642948316 +0000
+@@ -954,6 +954,19 @@
+       g_free (path);
+     }
+ 
++  /* Explorer: accels.scm jest wspoldzielony ze starszymi wersjami i z
++   * systemowym Thunarem - bywa w nim zapisane PUSTE przypisanie dla
++   * podgladu obrazow, ktore nadpisuje nasz domyslny skrot. Gdy akcja jest
++   * nieprzypisana, przywroc Ctrl+4. */
++  {
++    GtkAccelKey key;
++
++    if (gtk_accel_map_lookup_entry ("<Actions>/ThunarWindow/toggle-image-preview", &key)
++        && key.accel_key == 0)
++      gtk_accel_map_change_entry ("<Actions>/ThunarWindow/toggle-image-preview",
++                                  GDK_KEY_4, GDK_CONTROL_MASK, TRUE);
++  }
++
+   /* watch for thunar-internal accelerator changes, in order to write changes to file if required */
+   application->accel_map = gtk_accel_map_get ();
+   g_signal_connect_swapped (G_OBJECT (application->accel_map), "changed", G_CALLBACK (thunar_application_accel_map_changed), application);
