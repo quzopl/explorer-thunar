@@ -47,6 +47,15 @@ for m in libgvfsdbus.so libgioremote-volume-monitor.so; do
   [ -f "$GIO_MOD_SRC/$m" ] && install -m755 "$GIO_MOD_SRC/$m" "$AD/usr/lib/gio/modules/"
 done
 
+# 3b. pomocnik uruchamiania aplikacji: bundlowany libgio odpala programy przez
+# gio-launch-desktop spod zaszytej ścieżki dystrybucji builda — na innych
+# distro jej nie ma i KAŻDE otwarcie pliku/aplikacji pada ("No such file or
+# directory"). Bundlujemy binarkę i wskazujemy ją przez GIO_LAUNCH_DESKTOP.
+GLD="$(pkg-config --variable=libdir glib-2.0 2>/dev/null || echo /usr/lib/x86_64-linux-gnu)/glib-2.0/gio-launch-desktop"
+[ -f "$GLD" ] || GLD=/usr/libexec/gio-launch-desktop
+mkdir -p "$AD/usr/libexec"
+install -m755 "$GLD" "$AD/usr/libexec/gio-launch-desktop"
+
 # 4. linuxdeploy + plugin gtk (NO_STRIP: stary strip nie zna .relr.dyn z Arch)
 # libthunarx buduje się razem z Thunarem i leży tylko w AppDir — wskaż ją
 # linuxdeployowi (bez systemowego Thunara nie ma jej skąd wziąć)
@@ -63,6 +72,9 @@ linuxdeploy --appdir "$AD" \
 HOOK="$AD/apprun-hooks/linuxdeploy-plugin-gtk.sh"
 if ! grep -q GIO_MODULE_DIR "$HOOK"; then
   printf '\nexport GIO_MODULE_DIR="$APPDIR/usr/lib/gio/modules" # gvfs hosta przez D-Bus\n' >> "$HOOK"
+fi
+if ! grep -q GIO_LAUNCH_DESKTOP "$HOOK"; then
+  printf 'export GIO_LAUNCH_DESKTOP="$APPDIR/usr/libexec/gio-launch-desktop" # uruchamianie aplikacji\n' >> "$HOOK"
 fi
 
 # RUNPATH modułów wskazuje ścieżki dystrybucji builda (np.
