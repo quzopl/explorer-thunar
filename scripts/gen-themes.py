@@ -162,6 +162,31 @@ frame > border {{ border-color: {border}; }}
 combobox cellview, combobox label {{ color: {text}; }}
 textview, textview text {{ background-color: {field}; color: {text}; }}
 
+/* wskaźniki wyboru, suwaki, przełączniki, infobary — bez jawnych reguł
+ * bazowy motyw GTK (np. wymuszone w AppImage Adwaita:dark) przebija
+ * ciemnymi elementami i nieczytelnym tekstem w jasnych paletach */
+check, radio {{ background-color: {field}; background-image: none; box-shadow: none;
+  border: 1px solid {field_border}; color: #ffffff; min-width: 14px; min-height: 14px; }}
+check {{ border-radius: 3px; }}
+radio {{ border-radius: 50%; }}
+check:checked, radio:checked, check:indeterminate {{
+  background-color: {accent}; border-color: {accent}; color: #ffffff; }}
+scale trough {{ background-color: {field}; border: 1px solid {field_border};
+  border-radius: 4px; min-height: 6px; }}
+scale highlight {{ background-color: {accent}; border-radius: 4px; }}
+scale slider {{ background-color: #ffffff; background-image: none; box-shadow: none;
+  border: 1px solid {scroll}; border-radius: 50%; min-width: 16px; min-height: 16px; }}
+scale marks, scale value {{ color: {text_dim}; }}
+switch {{ background-color: {field}; background-image: none; border: 1px solid {field_border}; }}
+switch:checked {{ background-color: {accent}; border-color: {accent}; }}
+switch slider {{ background-color: #ffffff; background-image: none; box-shadow: none; }}
+spinbutton {{ background-color: {field}; color: {text}; border: 1px solid {field_border}; }}
+spinbutton button {{ background-color: transparent; color: {text}; border: none; }}
+infobar, infobar revealer > box, infobar > revealer > box {{
+  background-color: {hover}; background-image: none; color: {text}; }}
+infobar label {{ color: {text}; }}
+label.dim-label, .dim-label {{ color: {text_dim}; }}
+
 /* dialog postępu kopiowania/przenoszenia — bez tego pasek postępu
  * dziedziczy wygląd z motywu systemowego i gryzie się z paletą */
 progressbar trough {{ background-color: {field}; border: 1px solid {field_border};

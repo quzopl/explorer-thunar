@@ -84,6 +84,31 @@ frame > border { border-color: #3b4252; }
 combobox cellview, combobox label { color: #e5e9f0; }
 textview, textview text { background-color: #21262f; color: #e5e9f0; }
 
+/* wskaźniki wyboru, suwaki, przełączniki, infobary — bez jawnych reguł
+ * bazowy motyw GTK (np. wymuszone w AppImage Adwaita:dark) przebija
+ * ciemnymi elementami i nieczytelnym tekstem w jasnych paletach */
+check, radio { background-color: #21262f; background-image: none; box-shadow: none;
+  border: 1px solid #3b4252; color: #ffffff; min-width: 14px; min-height: 14px; }
+check { border-radius: 3px; }
+radio { border-radius: 50%; }
+check:checked, radio:checked, check:indeterminate {
+  background-color: #88c0d0; border-color: #88c0d0; color: #ffffff; }
+scale trough { background-color: #21262f; border: 1px solid #3b4252;
+  border-radius: 4px; min-height: 6px; }
+scale highlight { background-color: #88c0d0; border-radius: 4px; }
+scale slider { background-color: #ffffff; background-image: none; box-shadow: none;
+  border: 1px solid #434c5e; border-radius: 50%; min-width: 16px; min-height: 16px; }
+scale marks, scale value { color: #aebacf; }
+switch { background-color: #21262f; background-image: none; border: 1px solid #3b4252; }
+switch:checked { background-color: #88c0d0; border-color: #88c0d0; }
+switch slider { background-color: #ffffff; background-image: none; box-shadow: none; }
+spinbutton { background-color: #21262f; color: #e5e9f0; border: 1px solid #3b4252; }
+spinbutton button { background-color: transparent; color: #e5e9f0; border: none; }
+infobar, infobar revealer > box, infobar > revealer > box {
+  background-color: #353d4d; background-image: none; color: #e5e9f0; }
+infobar label { color: #e5e9f0; }
+label.dim-label, .dim-label { color: #aebacf; }
+
 /* dialog postępu kopiowania/przenoszenia — bez tego pasek postępu
  * dziedziczy wygląd z motywu systemowego i gryzie się z paletą */
 progressbar trough { background-color: #21262f; border: 1px solid #3b4252;

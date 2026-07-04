@@ -15,10 +15,11 @@ in Dark and Light), switchable live. A few of them:
 | **Aurora · Light** | **Porcelain · Light** |
 | ![Aurora Light](docs/screenshots/03-aurora-light.png) | ![Porcelain Light](docs/screenshots/04-porcelain-light.png) |
 
-Each image shows the same window: an always-visible **Search** box (top
-right), the **view switchers** (icons / details / compact) in the toolbar, a
-Windows-style **Places / Devices / Network** sidebar with all disks, and an
-English UI regardless of system locale.
+The screenshots show the CSD **header bar** (menu in the title bar), the
+**breadcrumb path bar**, the always-visible **Search** box, Finder-style
+**color labels** (icon view and full rows in the details view), exact
+**date + time** in the Date Modified column, and the right-hand **image
+preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
 
 > The images above are representative **mockups** generated on sample data
 > (`scripts/gen-mockups.py`) — no personal files. To capture real screenshots
