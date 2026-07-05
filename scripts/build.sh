@@ -18,7 +18,7 @@ if [ ! -f config.status ]; then
     --disable-introspection
 fi
 # wersja aplikacji (menu Help -> Check for Updates) z tagu gita
-EXPLORER_VERSION="$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)"
+EXPLORER_VERSION="${EXPLORER_VERSION_OVERRIDE:-$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)}"
 make -j"$(nproc)" CPPFLAGS="-DEXPLORER_VERSION='\"$EXPLORER_VERSION\"'"
 make install
 echo "OK: zainstalowano do $PREFIX"

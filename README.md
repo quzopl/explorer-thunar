@@ -53,8 +53,11 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   `bash scripts/build-plugins.sh` (needs `xfce4-dev-tools`, `libtagc0-dev`);
   the AppImage ships both, incl. taglib.
 - **Updates:** Help → "Check for Updates…" (plus a silent daily check) compares
-  the running version against the latest GitHub release; the AppImage embeds
-  zsync update info, so `AppImageUpdate` downloads only the delta.
+  the running version against the latest GitHub release. Running as an
+  AppImage, Explorer **updates itself**: one click downloads the new release,
+  verifies it and atomically replaces the AppImage file, then offers a
+  restart. The AppImage also embeds zsync update info for `AppImageUpdate`
+  delta updates.
 - **Color labels (Finder-style):** right-click selected files → **Color Label**
   (Red/Orange/Yellow/Green/Blue/Purple/Gray, None to clear). Stored as gvfs
   metadata (Thunar's file-highlight feature), rendered in every view.

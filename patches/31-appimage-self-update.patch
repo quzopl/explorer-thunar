@@ -1,0 +1,278 @@
+--- thunar/thunar-window.c.t31	2026-07-05 20:13:48.614459009 +0000
++++ thunar/thunar-window.c	2026-07-05 20:38:50.307888455 +0000
+@@ -27,6 +27,7 @@
+ #include <unistd.h>
+ #endif
+ #ifdef HAVE_LOCALE_H
++#include <glib/gstdio.h>
+ #include <locale.h>
+ #include <string.h>
+ #endif
+@@ -403,6 +404,10 @@
+ thunar_window_explorer_check_updates (ThunarWindow *window,
+                                       gboolean      interactive);
+ static void
++thunar_window_explorer_self_update (ThunarWindow *window,
++                                    const gchar  *tag,
++                                    const gchar  *appimage);
++static void
+ thunar_window_binding_create (ThunarWindow *window,
+                               gpointer      src_object,
+                               const gchar  *src_prop,
+@@ -1781,6 +1786,239 @@
+ 
+ 
+ 
++/* Explorer: samoaktualizacja AppImage — pobiera najnowszy plik z GitHub
++ * Releases, weryfikuje magic AppImage i podmienia wlasny plik ($APPIMAGE). */
++#ifndef EXPLORER_VERSION
++#define EXPLORER_VERSION "dev"
++#endif
++#define EXPLORER_DOWNLOAD_URL "https://github.com/quzopl/explorer-thunar/releases/latest/download/Explorer-x86_64.AppImage"
++
++typedef struct
++{
++  ThunarWindow *window;
++  gchar        *appimage;
++  gchar        *tmpfile;
++  gchar        *tag;
++  GtkWidget    *progress_dialog;
++  GtkWidget    *progress_bar;
++  guint         pulse_id;
++  GSubprocess  *proc;
++} ThunarExplorerSelfUpdate;
++
++static void
++thunar_explorer_self_update_free (ThunarExplorerSelfUpdate *update)
++{
++  if (update->pulse_id != 0)
++    g_source_remove (update->pulse_id);
++  if (update->progress_dialog != NULL)
++    gtk_widget_destroy (update->progress_dialog);
++  g_clear_object (&update->proc);
++  g_object_unref (update->window);
++  g_free (update->appimage);
++  g_free (update->tmpfile);
++  g_free (update->tag);
++  g_slice_free (ThunarExplorerSelfUpdate, update);
++}
++
++static gboolean
++thunar_explorer_self_update_pulse (gpointer data)
++{
++  ThunarExplorerSelfUpdate *update = data;
++  gtk_progress_bar_pulse (GTK_PROGRESS_BAR (update->progress_bar));
++  return TRUE;
++}
++
++static void
++thunar_explorer_self_update_cancelled (GtkDialog *dialog,
++                                       gint       response,
++                                       gpointer   data)
++{
++  ThunarExplorerSelfUpdate *update = data;
++  if (update->proc != NULL)
++    g_subprocess_force_exit (update->proc);
++}
++
++/* czy plik wyglada na AppImage (ELF + magic 'AI\x02') i ma sensowny rozmiar */
++static gboolean
++thunar_explorer_self_update_valid (const gchar *path)
++{
++  guchar   head[16] = { 0 };
++  FILE    *fp;
++  gboolean ok = FALSE;
++  GStatBuf st;
++
++  if (g_stat (path, &st) != 0 || st.st_size < 5 * 1024 * 1024)
++    return FALSE;
++
++  fp = fopen (path, "rb");
++  if (fp != NULL)
++    {
++      ok = fread (head, 1, sizeof (head), fp) == sizeof (head)
++           && head[0] == 0x7f && head[1] == 'E' && head[2] == 'L' && head[3] == 'F'
++           && head[8] == 'A' && head[9] == 'I' && head[10] == 0x02;
++      fclose (fp);
++    }
++  return ok;
++}
++
++static void
++thunar_explorer_self_update_done (GObject      *source,
++                                  GAsyncResult *result,
++                                  gpointer      data)
++{
++  ThunarExplorerSelfUpdate *update = data;
++  GtkWidget                *dialog;
++  gchar                    *backup;
++  gboolean                  swapped = FALSE;
++
++  /* schowaj dialog postepu */
++  if (update->pulse_id != 0)
++    {
++      g_source_remove (update->pulse_id);
++      update->pulse_id = 0;
++    }
++  if (update->progress_dialog != NULL)
++    {
++      gtk_widget_destroy (update->progress_dialog);
++      update->progress_dialog = NULL;
++    }
++
++  if (!g_subprocess_wait_check_finish (G_SUBPROCESS (source), result, NULL)
++      || !thunar_explorer_self_update_valid (update->tmpfile))
++    {
++      g_unlink (update->tmpfile);
++      dialog = gtk_message_dialog_new (GTK_WINDOW (update->window),
++                                       GTK_DIALOG_DESTROY_WITH_PARENT,
++                                       GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
++                                       _("The update could not be downloaded. Please try again later."));
++      gtk_dialog_run (GTK_DIALOG (dialog));
++      gtk_widget_destroy (dialog);
++      thunar_explorer_self_update_free (update);
++      return;
++    }
++
++  /* atomowa podmiana z kopia bezpieczenstwa */
++  backup = g_strconcat (update->appimage, ".update-bak", NULL);
++  g_unlink (backup);
++  g_chmod (update->tmpfile, 0755);
++  if (g_rename (update->appimage, backup) == 0)
++    {
++      if (g_rename (update->tmpfile, update->appimage) == 0)
++        {
++          g_unlink (backup);
++          swapped = TRUE;
++        }
++      else
++        g_rename (backup, update->appimage);
++    }
++  g_free (backup);
++
++  if (!swapped)
++    {
++      g_unlink (update->tmpfile);
++      dialog = gtk_message_dialog_new (GTK_WINDOW (update->window),
++                                       GTK_DIALOG_DESTROY_WITH_PARENT,
++                                       GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
++                                       _("The downloaded update could not replace the AppImage file."));
++      gtk_dialog_run (GTK_DIALOG (dialog));
++      gtk_widget_destroy (dialog);
++      thunar_explorer_self_update_free (update);
++      return;
++    }
++
++  dialog = gtk_message_dialog_new (GTK_WINDOW (update->window),
++                                   GTK_DIALOG_DESTROY_WITH_PARENT,
++                                   GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
++                                   _("Explorer was updated to %s. Restart to start using the new version."),
++                                   update->tag);
++  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
++                          _("Restart _later"), GTK_RESPONSE_CLOSE,
++                          _("_Restart now"), GTK_RESPONSE_ACCEPT, NULL);
++  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
++    {
++      gchar *cmd = g_strdup_printf ("sleep 2; exec \"%s\"", update->appimage);
++      gchar *argv[] = { "/bin/sh", "-c", NULL, NULL };
++      argv[2] = cmd;
++      g_spawn_async (NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, NULL);
++      g_free (cmd);
++      gtk_widget_destroy (dialog);
++      thunar_explorer_self_update_free (update);
++      g_application_quit (g_application_get_default ());
++      return;
++    }
++  gtk_widget_destroy (dialog);
++  thunar_explorer_self_update_free (update);
++}
++
++static void
++thunar_window_explorer_self_update (ThunarWindow *window,
++                                    const gchar  *tag,
++                                    const gchar  *appimage)
++{
++  ThunarExplorerSelfUpdate *update;
++  GtkWidget                *dialog;
++  GtkWidget                *box;
++  GSubprocess              *proc;
++  gchar                    *tmpfile;
++
++  dialog = gtk_message_dialog_new (GTK_WINDOW (window), GTK_DIALOG_DESTROY_WITH_PARENT,
++                                   GTK_MESSAGE_INFO, GTK_BUTTONS_NONE,
++                                   _("A new version of Explorer is available: %s (installed: %s).\n"
++                                     "Download and install it now?"),
++                                   tag, EXPLORER_VERSION);
++  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
++                          _("_Later"), GTK_RESPONSE_CLOSE,
++                          _("_Update now"), GTK_RESPONSE_ACCEPT, NULL);
++  if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_ACCEPT)
++    {
++      gtk_widget_destroy (dialog);
++      return;
++    }
++  gtk_widget_destroy (dialog);
++
++  tmpfile = g_strconcat (appimage, ".update-new", NULL);
++  g_unlink (tmpfile);
++  proc = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_SILENCE | G_SUBPROCESS_FLAGS_STDERR_SILENCE,
++                           NULL, "curl", "-fSL", "--retry", "2", "-m", "600",
++                           "-o", tmpfile, EXPLORER_DOWNLOAD_URL, NULL);
++  if (proc == NULL)
++    {
++      dialog = gtk_message_dialog_new (GTK_WINDOW (window), GTK_DIALOG_DESTROY_WITH_PARENT,
++                                       GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s",
++                                       _("Could not start the download: 'curl' is not installed."));
++      gtk_dialog_run (GTK_DIALOG (dialog));
++      gtk_widget_destroy (dialog);
++      g_free (tmpfile);
++      return;
++    }
++
++  update = g_slice_new0 (ThunarExplorerSelfUpdate);
++  update->window = g_object_ref (window);
++  update->appimage = g_strdup (appimage);
++  update->tmpfile = tmpfile;
++  update->tag = g_strdup (tag);
++  update->proc = g_object_ref (proc);
++
++  update->progress_dialog = gtk_dialog_new_with_buttons (_("Updating Explorer"),
++                                                         GTK_WINDOW (window),
++                                                         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
++                                                         _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
++  box = gtk_dialog_get_content_area (GTK_DIALOG (update->progress_dialog));
++  gtk_container_set_border_width (GTK_CONTAINER (box), 18);
++  gtk_box_pack_start (GTK_BOX (box), gtk_label_new (_("Downloading the new version...")), FALSE, FALSE, 6);
++  update->progress_bar = gtk_progress_bar_new ();
++  gtk_box_pack_start (GTK_BOX (box), update->progress_bar, FALSE, FALSE, 6);
++  g_signal_connect (update->progress_dialog, "response",
++                    G_CALLBACK (thunar_explorer_self_update_cancelled), update);
++  gtk_widget_show_all (update->progress_dialog);
++  update->pulse_id = g_timeout_add (120, thunar_explorer_self_update_pulse, update);
++
++  g_subprocess_wait_check_async (proc, NULL, thunar_explorer_self_update_done, update);
++  g_object_unref (proc);
++}
++
++
++
+ /* Explorer: sprawdzanie aktualizacji (GitHub Releases API przez curl).
+  * EXPLORER_VERSION wstrzykuje build (scripts/build*.sh) z tagu gita. */
+ #ifndef EXPLORER_VERSION
+@@ -1816,7 +2054,15 @@
+       && (end = strchr (p + 1, '"')) != NULL)
+     tag = g_strndup (p + 1, end - p - 1);
+ 
+-  if (tag != NULL && g_strcmp0 (tag, EXPLORER_VERSION) != 0)
++  if (tag != NULL && g_strcmp0 (tag, EXPLORER_VERSION) != 0
++      && (p = g_getenv ("APPIMAGE")) != NULL && *p != '\0'
++      && g_file_test (p, G_FILE_TEST_IS_REGULAR)
++      && access (p, W_OK) == 0)
++    {
++      /* AppImage z prawem zapisu — pelna samoaktualizacja */
++      thunar_window_explorer_self_update (check->window, tag, p);
++    }
++  else if (tag != NULL && g_strcmp0 (tag, EXPLORER_VERSION) != 0)
+     {
+       dialog = gtk_message_dialog_new (GTK_WINDOW (check->window),
+                                        GTK_DIALOG_DESTROY_WITH_PARENT,

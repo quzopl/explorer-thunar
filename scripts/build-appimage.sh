@@ -22,7 +22,7 @@ cd thunar-src
 # pełne przebudowanie: po zmianie prefiksu stare obiekty mają zapieczone
 # poprzednie ścieżki (DATADIR itd.)
 make clean >/dev/null 2>&1 || true
-EXPLORER_VERSION="$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)"
+EXPLORER_VERSION="${EXPLORER_VERSION_OVERRIDE:-$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)}"
 make -j"$(nproc)" CPPFLAGS="-DEXPLORER_VERSION='\"$EXPLORER_VERSION\"'"
 make install DESTDIR="$AD"
 cd "$ROOT"
