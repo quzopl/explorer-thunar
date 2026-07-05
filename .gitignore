@@ -6,3 +6,4 @@ thunar-src/
 .cache/
 dist/
 AppDir/
+plugins-src/

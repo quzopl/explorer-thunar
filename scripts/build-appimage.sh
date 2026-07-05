@@ -17,7 +17,8 @@ export PATH="/tmp:$PATH"
 # 1. build z prefiksem /usr do AppDir
 # --disable-introspection: bez tego build pada na 'Thunarx-3.0.typelib'
 cd thunar-src
-./configure --prefix=/usr --disable-static --disable-introspection
+./configure --prefix=/usr --disable-static --disable-introspection \
+  --with-custom-thunarx-dirs-enabled
 # pełne przebudowanie: po zmianie prefiksu stare obiekty mają zapieczone
 # poprzednie ścieżki (DATADIR itd.)
 make clean >/dev/null 2>&1 || true
@@ -25,6 +26,10 @@ EXPLORER_VERSION="$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev
 make -j"$(nproc)" CPPFLAGS="-DEXPLORER_VERSION='\"$EXPLORER_VERSION\"'"
 make install DESTDIR="$AD"
 cd "$ROOT"
+
+# 1a. oficjalne wtyczki (archive, media-tags) — do AppDir; ładowane przez
+# THUNARX_DIRS z hooka (zaszyty katalog wtyczek to absolutna ścieżka hosta)
+CONFIGURE_PREFIX=/usr DESTDIR="$AD" bash scripts/build-plugins.sh
 
 # 2. branding + symlink + desktop
 mkdir -p "$AD/usr/share/explorer/themes" "$AD/usr/share/applications"
@@ -77,6 +82,9 @@ fi
 if ! grep -q GIO_LAUNCH_DESKTOP "$HOOK"; then
   printf 'export GIO_LAUNCH_DESKTOP="$APPDIR/usr/libexec/gio-launch-desktop" # uruchamianie aplikacji\n' >> "$HOOK"
 fi
+if ! grep -q THUNARX_DIRS "$HOOK"; then
+  printf 'export THUNARX_DIRS="$APPDIR/usr/lib/thunarx-3" # bundlowane wtyczki\n' >> "$HOOK"
+fi
 
 # akcje UCA dla użytkowników AppImage: zasiej ~/.config/Thunar/uca.xml z
 # szablonu, a istniejącemu dołóż akcję "Open in Terminal", jeśli jej brak
@@ -112,6 +120,7 @@ fi
 # dlopen modułu pada po cichu (libgvfscommon nieznajdowalna) i gvfs znika.
 # Przestaw na bundlowane usr/lib.
 patchelf --set-rpath '$ORIGIN/../..' "$AD"/usr/lib/gio/modules/*.so
+patchelf --set-rpath '$ORIGIN/..' "$AD"/usr/lib/thunarx-3/*.so
 
 # faza 2: spakuj AppImage z informacją aktualizacyjną zsync (AppImageUpdate
 # pobiera wtedy tylko różnice między wydaniami z GitHub Releases)

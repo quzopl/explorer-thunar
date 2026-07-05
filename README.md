@@ -45,6 +45,13 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   **tabs** in the existing window.
 - **Computer:** a "Computer" sidebar entry (`computer://`, needs `gvfs`) lists
   all drives — the closest equivalent of Windows' "This PC".
+- **Plugins (bundled):** the official `thunar-archive-plugin` (right-click →
+  **Extract Here / Extract To… / Create Archive…**, delegating to
+  ark/file-roller/engrampa/xarchiver — whichever is installed) and
+  `thunar-media-tags-plugin` (audio-tag page in Properties + "Audio tags"
+  bulk-rename mode; taglib). Build them locally with
+  `bash scripts/build-plugins.sh` (needs `xfce4-dev-tools`, `libtagc0-dev`);
+  the AppImage ships both, incl. taglib.
 - **Updates:** Help → "Check for Updates…" (plus a silent daily check) compares
   the running version against the latest GitHub release; the AppImage embeds
   zsync update info, so `AppImageUpdate` downloads only the delta.
@@ -86,6 +93,7 @@ bash scripts/fetch-sources.sh     # download Thunar 4.20.8 into thunar-src/
 bash scripts/apply-patches.sh     # apply patches/01..26
 bash scripts/build.sh             # ./configure + make + make install -> install/
 bash scripts/install-branding.sh  # explorer binary, .desktop, icon, themes
+bash scripts/build-plugins.sh     # optional: archive + media-tags plugins
 ```
 
 Run it: `./install/bin/explorer`
