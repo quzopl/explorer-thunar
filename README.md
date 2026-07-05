@@ -45,6 +45,9 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   **tabs** in the existing window.
 - **Computer:** a "Computer" sidebar entry (`computer://`, needs `gvfs`) lists
   all drives — the closest equivalent of Windows' "This PC".
+- **Updates:** Help → "Check for Updates…" (plus a silent daily check) compares
+  the running version against the latest GitHub release; the AppImage embeds
+  zsync update info, so `AppImageUpdate` downloads only the delta.
 - **Color labels (Finder-style):** right-click selected files → **Color Label**
   (Red/Orange/Yellow/Green/Blue/Purple/Gray, None to clear). Stored as gvfs
   metadata (Thunar's file-highlight feature), rendered in every view.

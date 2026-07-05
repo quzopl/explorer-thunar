@@ -17,6 +17,8 @@ if [ ! -f config.status ]; then
   ./configure --prefix="$PREFIX" --disable-static --enable-gio-unix \
     --disable-introspection
 fi
-make -j"$(nproc)"
+# wersja aplikacji (menu Help -> Check for Updates) z tagu gita
+EXPLORER_VERSION="$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)"
+make -j"$(nproc)" CPPFLAGS="-DEXPLORER_VERSION='\"$EXPLORER_VERSION\"'"
 make install
 echo "OK: zainstalowano do $PREFIX"

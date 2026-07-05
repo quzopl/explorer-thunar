@@ -21,7 +21,8 @@ cd thunar-src
 # pełne przebudowanie: po zmianie prefiksu stare obiekty mają zapieczone
 # poprzednie ścieżki (DATADIR itd.)
 make clean >/dev/null 2>&1 || true
-make -j"$(nproc)"
+EXPLORER_VERSION="$(git -C .. describe --tags --abbrev=0 2>/dev/null || echo dev)"
+make -j"$(nproc)" CPPFLAGS="-DEXPLORER_VERSION='\"$EXPLORER_VERSION\"'"
 make install DESTDIR="$AD"
 cd "$ROOT"
 
@@ -112,7 +113,10 @@ fi
 # Przestaw na bundlowane usr/lib.
 patchelf --set-rpath '$ORIGIN/../..' "$AD"/usr/lib/gio/modules/*.so
 
-# faza 2: spakuj AppImage
+# faza 2: spakuj AppImage z informacją aktualizacyjną zsync (AppImageUpdate
+# pobiera wtedy tylko różnice między wydaniami z GitHub Releases)
+export LDAI_UPDATE_INFORMATION="gh-releases-zsync|quzopl|explorer-thunar|latest|Explorer-x86_64.AppImage.zsync"
 linuxdeploy --appdir "$AD" --output appimage
 mkdir -p dist && mv -f Explorer-x86_64.AppImage dist/
+mv -f Explorer-x86_64.AppImage.zsync dist/ 2>/dev/null || true
 echo "OK: dist/Explorer-x86_64.AppImage"
