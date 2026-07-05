@@ -77,6 +77,35 @@ if ! grep -q GIO_LAUNCH_DESKTOP "$HOOK"; then
   printf 'export GIO_LAUNCH_DESKTOP="$APPDIR/usr/libexec/gio-launch-desktop" # uruchamianie aplikacji\n' >> "$HOOK"
 fi
 
+# akcje UCA dla użytkowników AppImage: zasiej ~/.config/Thunar/uca.xml z
+# szablonu, a istniejącemu dołóż akcję "Open in Terminal", jeśli jej brak
+# (użytkownicy AppImage nie uruchamiają install-branding.sh)
+cat > "$AD/usr/bin/explorer-uca-setup.sh" <<'EOSETUP'
+#!/bin/sh
+# idempotentna migracja akcji UCA (wołana z AppRun przy każdym starcie)
+TPL="$APPDIR/usr/etc/xdg/Thunar/uca.xml"
+[ -f "$TPL" ] || TPL="$APPDIR/etc/xdg/Thunar/uca.xml"
+UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
+[ -f "$TPL" ] || exit 0
+if [ ! -f "$UCA" ]; then
+  mkdir -p "$(dirname "$UCA")" && cp "$TPL" "$UCA"
+  exit 0
+fi
+grep -q 'Open in Terminal' "$UCA" && exit 0
+grep -q '</actions>' "$UCA" || exit 0
+BLK="$(mktemp)" || exit 0
+awk '/<action>/{buf="";inA=1} inA{buf=buf $0 "\n"} /<\/action>/{inA=0; if (buf ~ /Open in Terminal/) blk=buf} END{printf "%s", blk}' "$TPL" > "$BLK"
+[ -s "$BLK" ] || { rm -f "$BLK"; exit 0; }
+cp "$UCA" "$UCA.bak.appimage" 2>/dev/null
+TMP="$(mktemp)" || { rm -f "$BLK"; exit 0; }
+awk -v f="$BLK" '/<\/actions>/{while ((getline l < f) > 0) print l} {print}' "$UCA" > "$TMP" && mv "$TMP" "$UCA"
+rm -f "$BLK"
+EOSETUP
+chmod 755 "$AD/usr/bin/explorer-uca-setup.sh"
+if ! grep -q explorer-uca-setup "$HOOK"; then
+  printf 'sh "$APPDIR/usr/bin/explorer-uca-setup.sh" 2>/dev/null || true # akcje UCA\n' >> "$HOOK"
+fi
+
 # RUNPATH modułów wskazuje ścieżki dystrybucji builda (np.
 # /usr/lib/x86_64-linux-gnu/gvfs), których nie ma na innych distro — wtedy
 # dlopen modułu pada po cichu (libgvfscommon nieznajdowalna) i gvfs znika.

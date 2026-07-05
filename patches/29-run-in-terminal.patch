@@ -1,0 +1,18 @@
+--- plugins/thunar-uca/uca.xml.in.t29	2026-07-05 08:22:50.721251569 +0000
++++ plugins/thunar-uca/uca.xml.in	2026-07-05 08:22:50.776251802 +0000
+@@ -46,4 +46,15 @@
+     <directories/>
+   </action>
+ 
++  <action>
++    <icon>utilities-terminal</icon>
++    <patterns>*</patterns>
++    <name>Open in Terminal</name>
++    <command>f=%f; export f; RUN='cd "$(dirname "$f")"; if [ -x "$f" ]; then "$f"; else sh "$f"; fi; s=$?; echo; echo "[process exited with code $s] press Enter to close"; read _'; if command -v konsole >/dev/null; then exec konsole -e sh -c "$RUN"; elif command -v xfce4-terminal >/dev/null; then exec xfce4-terminal -x sh -c "$RUN"; elif command -v gnome-terminal >/dev/null; then exec gnome-terminal -- sh -c "$RUN"; elif command -v x-terminal-emulator >/dev/null; then exec x-terminal-emulator -e sh -c "$RUN"; else exec xterm -e sh -c "$RUN"; fi</command>
++    <description>Run the selected file in a terminal window</description>
++    <startup-notify/>
++    <text-files/>
++    <other-files/>
++  </action>
++
+ </actions>

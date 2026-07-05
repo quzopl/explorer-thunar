@@ -61,6 +61,22 @@ s = open(uca).read()
 out = s
 for old in old_cmds:
     out = out.replace('<command>%s</command>' % old, '<command>%s</command>' % new_cmd)
+
+# akcja "Open in Terminal" (uruchom plik w terminalu) — dołóż, jeśli brak
+run_cmd = ('f=%f; export f; RUN=\'cd "$(dirname "$f")"; if [ -x "$f" ]; then "$f"; else sh "$f"; fi; s=$?; echo; '
+           'echo "[process exited with code $s] press Enter to close"; read _\'; '
+           'if command -v konsole >/dev/null; then exec konsole -e sh -c "$RUN"; '
+           'elif command -v xfce4-terminal >/dev/null; then exec xfce4-terminal -x sh -c "$RUN"; '
+           'elif command -v gnome-terminal >/dev/null; then exec gnome-terminal -- sh -c "$RUN"; '
+           'elif command -v x-terminal-emulator >/dev/null; then exec x-terminal-emulator -e sh -c "$RUN"; '
+           'else exec xterm -e sh -c "$RUN"; fi')
+if '<name>Open in Terminal</name>' not in out and '</actions>' in out:
+    action = ('  <action>\n    <icon>utilities-terminal</icon>\n    <patterns>*</patterns>\n'
+              '    <name>Open in Terminal</name>\n    <command>%s</command>\n'
+              '    <description>Run the selected file in a terminal window</description>\n'
+              '    <startup-notify/>\n    <text-files/>\n    <other-files/>\n  </action>\n\n</actions>' % run_cmd)
+    out = out.replace('</actions>', action)
+
 if out != s:
     import time
     open('%s.bak.%d' % (uca, time.time()), 'w').write(s)

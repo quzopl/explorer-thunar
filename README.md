@@ -54,7 +54,9 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   with a graceful fallback to an installed theme (e.g. `breeze`) when absent.
 - **Terminal:** right-click in a folder → "Open Terminal Here" tries `konsole`,
   then `xfce4-terminal`, `gnome-terminal`, `x-terminal-emulator`, `xterm` —
-  whichever is installed first.
+  whichever is installed first. Right-click a file → **"Open in Terminal"**
+  runs it in a terminal window (scripts without `+x` run via `sh`) and keeps
+  the window open with the exit code.
 - **All drives:** `scripts/enable-gvfs-drives.sh` (sudo) adds `x-gvfs-show` to
   `/mnt/*` fstab entries so every disk appears under "Devices".
 - **Isolation:** its own application id `io.github.quzopl.Explorer` and its own Xfconf
