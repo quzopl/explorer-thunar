@@ -1,0 +1,58 @@
+--- thunar/thunar-window.c.t32	2026-07-10 06:20:11.732353792 +0000
++++ thunar/thunar-window.c	2026-07-10 06:20:11.776353936 +0000
+@@ -5412,9 +5412,11 @@
+ thunar_window_action_about (ThunarWindow *window)
+ {
+   /* just popup the about dialog */
+-  thunar_dialogs_show_about (GTK_WINDOW (window), PACKAGE_NAME,
+-                             _("Thunar is a fast and easy to use file manager\n"
+-                               "for the Xfce Desktop Environment."));
++  /* Explorer: pokaz wersje nakladki i silnika */
++  thunar_dialogs_show_about (GTK_WINDOW (window), "Explorer",
++                             _("A Windows-11-style file manager\n"
++                               "built on the Thunar %s engine."),
++                             PACKAGE_VERSION);
+ 
+   /* required in case of shortcut activation, in order to signal that the accel key got handled */
+   return TRUE;
+--- thunar/thunar-dialogs.c.t32	2026-07-10 06:20:11.736353805 +0000
++++ thunar/thunar-dialogs.c	2026-07-10 06:20:11.779353946 +0000
+@@ -429,6 +429,7 @@
+ 
+   va_list args;
+   gchar  *comments;
++  gchar  *version;
+ 
+   _thunar_return_if_fail (parent == NULL || GTK_IS_WINDOW (parent));
+ 
+@@ -437,6 +438,12 @@
+   comments = g_strdup_vprintf (format, args);
+   va_end (args);
+ 
++  /* Explorer: wersja nakladki (z tagu gita) + wersja silnika Thunar */
++#ifndef EXPLORER_VERSION
++#define EXPLORER_VERSION "dev"
++#endif
++  version = g_strdup_printf ("%s (Thunar %s)", EXPLORER_VERSION, PACKAGE_VERSION);
++
+   /* open the about dialog */
+   gtk_show_about_dialog (parent,
+                          "artists", artists,
+@@ -450,14 +457,15 @@
+                          "destroy-with-parent", TRUE,
+                          "documenters", documenters,
+                          "license", XFCE_LICENSE_GPL,
+-                         "logo-icon-name", "org.xfce.thunar",
++                         "logo-icon-name", "explorer",
+                          "program-name", title,
+                          "translator-credits", _("translator-credits"),
+-                         "version", PACKAGE_VERSION,
++                         "version", version,
+                          "website", "https://docs.xfce.org/xfce/thunar/start",
+                          NULL);
+ 
+   /* cleanup */
++  g_free (version);
+   g_free (comments);
+ }
+ 
