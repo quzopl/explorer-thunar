@@ -1,0 +1,124 @@
+/* Explorer 2.0 — NOVA shell (GTK4 + libadwaita) */
+* { font-family: "Space Grotesk", "Segoe UI", "Noto Sans", sans-serif; }
+
+.nova-root { background-color: #070A12; color: #E7EDFF; }
+
+/* ——— header ——— */
+.nova-header { background-color: #070A12; padding: 8px 12px; }
+.nova-logo { font-weight: 700; font-size: 15px; color: #E7EDFF; }
+.nova-logo-badge { background-image: linear-gradient(135deg,#5CE1E6,#8B7CFF);
+  border-radius: 8px; color: #06101a; font-weight: 700; padding: 3px 9px; }
+.nova-navbtn { background: transparent; border: none; border-radius: 9px; padding: 6px 8px;
+  color: #8A94B8; min-width: 0; min-height: 0; }
+.nova-navbtn:hover { background-color: alpha(#94B4FF,.08); color: #E7EDFF; }
+
+.nova-crumbs { background-color: #101728; border: 1px solid alpha(#94B4FF,.14);
+  border-radius: 11px; padding: 3px 6px; }
+.nova-crumb { background: transparent; border: none; border-radius: 8px; padding: 4px 11px;
+  color: #8A94B8; font-weight: 500; box-shadow: none; }
+.nova-crumb:hover { background-color: alpha(#94B4FF,.08); color: #E7EDFF; }
+.nova-crumb.active { background-color: alpha(#5CE1E6,.14); color: #E7EDFF; }
+.nova-crumb-sep { color: #45507a; }
+
+.nova-search { background-color: #101728; border: 1px solid alpha(#94B4FF,.14);
+  border-radius: 11px; padding: 4px 12px; color: #E7EDFF; }
+.nova-search:focus-within { border-color: #5CE1E6; box-shadow: 0 0 14px alpha(#5CE1E6,.30); }
+.nova-search entry, .nova-search text { background: transparent; border: none; color: #E7EDFF;
+  box-shadow: none; outline: none; }
+.nova-kbd { background-color: alpha(#94B4FF,.10); border-radius: 6px; color: #8A94B8;
+  padding: 1px 7px; font-size: 11px; }
+
+.nova-seg { background-color: #101728; border: 1px solid alpha(#94B4FF,.14);
+  border-radius: 11px; padding: 3px; }
+.nova-seg button { background: transparent; border: none; border-radius: 8px; padding: 5px 9px;
+  color: #8A94B8; min-height: 0; box-shadow: none; }
+.nova-seg button:hover { background-color: alpha(#94B4FF,.08); color: #E7EDFF; }
+.nova-seg button.active { background-color: alpha(#5CE1E6,.14); color: #5CE1E6; }
+
+.nova-dot { border-radius: 50%; min-width: 13px; min-height: 13px; padding: 0;
+  border: none; box-shadow: none; }
+.nova-dot.min, .nova-dot.max { background-color: #2b3552; background-image: none; }
+.nova-dot.close { background-color: #F45C7F; background-image: none; }
+.nova-dot:hover { box-shadow: 0 0 8px alpha(#5CE1E6,.4); }
+
+/* ——— sidebar ——— */
+.nova-sidebar { background-color: #0C111E; border: 1px solid alpha(#94B4FF,.10);
+  border-radius: 16px; padding: 10px; margin: 0 0 12px 12px; }
+.nova-section { color: #5b6488; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  padding: 12px 8px 4px 8px; }
+.nova-section-ai { background-image: linear-gradient(90deg,#5CE1E6,#8B7CFF);
+  border-radius: 6px; color: #06101a; padding: 1px 6px; font-size: 9px; font-weight: 700; }
+.nova-list, .nova-list > row, list.nova-list { background: transparent; box-shadow: none;
+  border: none; }
+row.nova-row, .nova-row { background: transparent; border-radius: 10px; padding: 8px 10px;
+  color: #cdd5ee; }
+.nova-row:hover { background-color: alpha(#94B4FF,.08); }
+.nova-row:selected, .nova-row.active { background-color: alpha(#5CE1E6,.10);
+  border: 1px solid alpha(#5CE1E6,.45); color: #E7EDFF; }
+.nova-row-icon { color: #8A94B8; }
+.nova-row.active .nova-row-icon { color: #5CE1E6; }
+.nova-count { color: #5b6488; font-size: 12px; }
+
+.nova-devcard { background-color: #101728; border: 1px solid alpha(#94B4FF,.10);
+  border-radius: 12px; padding: 10px 11px; margin: 4px 2px; }
+.nova-dev-name { color: #E7EDFF; font-weight: 600; }
+.nova-dev-pct { color: #8A94B8; font-size: 12px; }
+.nova-dev-sub { color: #5b6488; font-size: 11px; }
+levelbar trough { background-color: #0a0f1c; border: none; border-radius: 4px; min-height: 6px; }
+levelbar block.filled { border-radius: 4px; background-color: #5CE1E6; }
+levelbar.acc block.filled { background-image: linear-gradient(90deg,#5CE1E6,#8B7CFF); }
+.nova-map { min-height: 10px; border-radius: 5px; }
+
+/* ——— content ——— */
+.nova-content { background-color: #070A12; }
+.nova-selbar { background-color: alpha(#5CE1E6,.08);
+  border: 1px solid alpha(#5CE1E6,.30); border-radius: 12px; padding: 8px 14px; margin: 6px 10px; }
+.nova-pillbtn { background-color: #101728; border: 1px solid alpha(#94B4FF,.14);
+  border-radius: 9px; padding: 6px 14px; color: #E7EDFF; box-shadow: none; }
+.nova-pillbtn:hover { background-color: alpha(#94B4FF,.10); }
+.nova-pillbtn.primary { background-image: linear-gradient(135deg,#5CE1E6,#8B7CFF);
+  color: #06101a; border: none; font-weight: 600; }
+.nova-pillbtn.danger:hover { background-color: alpha(#F45C7F,.18); border-color: #F45C7F; }
+
+gridview.nova-grid, .nova-grid { background: transparent; padding: 6px; }
+.nova-grid > child { border-radius: 14px; padding: 0; outline: none; box-shadow: none; }
+.nova-grid > child:focus, .nova-grid > child:focus-visible,
+.nova-grid > child:focus-within { outline: none; box-shadow: none; }
+.nova-grid > child:selected { background: transparent; }
+.nova-tile { background-color: #0C111E; border: 1px solid alpha(#94B4FF,.10);
+  border-radius: 14px; padding: 14px 10px; margin: 6px; }
+.nova-tile:hover { border-color: alpha(#94B4FF,.28); background-color: #101728; }
+.nova-grid > child:selected .nova-tile { border-color: alpha(#5CE1E6,.55);
+  background-color: alpha(#5CE1E6,.08); box-shadow: 0 0 18px alpha(#5CE1E6,.14); }
+.nova-thumb { border-radius: 10px; min-height: 76px; min-width: 96px;
+  background-image: radial-gradient(120% 120% at 20% 0%, alpha(#5CE1E6,.16), #101728); }
+.nova-tile-name { color: #E7EDFF; font-size: 13px; }
+.nova-tile-sub { color: #5b6488; font-size: 11px; }
+
+/* odcienie miniatur wg typu (klasy zamiast per-widget providerów) */
+.tint-dir   { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#5CE1E6,.18), #101728); }
+.tint-pdf   { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#F87171,.18), #101728); }
+.tint-doc   { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#60A5FA,.18), #101728); }
+.tint-sheet { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#34D399,.18), #101728); }
+.tint-arch  { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#F59E0B,.18), #101728); }
+.tint-img   { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#F472B6,.18), #101728); }
+.tint-video { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#8B7CFF,.18), #101728); }
+.tint-audio { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#60A5FA,.18), #101728); }
+.tint-code  { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#5CE1E6,.16), #101728); }
+.tint-text  { background-image: radial-gradient(120% 120% at 20% 0%, alpha(#94A3B8,.16), #101728); }
+
+/* ——— preview ——— */
+.nova-preview { background-color: #0C111E; border: 1px solid alpha(#94B4FF,.10);
+  border-radius: 16px; padding: 14px; margin: 0 12px 12px 0; }
+.nova-prev-title { color: #E7EDFF; font-weight: 600; font-size: 15px; }
+.nova-prev-k { color: #5b6488; font-size: 12px; }
+.nova-prev-v { color: #cdd5ee; font-size: 12px; }
+.nova-prev-thumb { border-radius: 12px; min-height: 150px;
+  background-image: radial-gradient(120% 120% at 20% 0%, alpha(#5CE1E6,.18), #101728); }
+
+.nova-status { background-color: #070A12; color: #5b6488; font-size: 12px; padding: 6px 14px; }
+
+scrollbar { background: transparent; border: none; }
+scrollbar slider { background-color: alpha(#94B4FF,.20); border-radius: 8px; min-width: 6px; }
+scrollbar slider:hover { background-color: alpha(#94B4FF,.34); }
+tooltip { background-color: #101728; border: 1px solid alpha(#5CE1E6,.35); border-radius: 10px; }
