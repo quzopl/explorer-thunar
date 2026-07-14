@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Explorer
+GenericName=File Manager
+Comment=NOVA-style file manager (GTK4)
+Exec=explorer-nova %f
+Icon=explorer
+Terminal=false
+Categories=System;Utility;Core;GTK;FileManager;
+StartupNotify=true
+StartupWMClass=explorer
+MimeType=inode/directory;

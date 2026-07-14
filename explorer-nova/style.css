@@ -118,6 +118,25 @@ gridview.nova-grid, .nova-grid { background: transparent; padding: 6px; }
 
 .nova-status { background-color: #070A12; color: #5b6488; font-size: 12px; padding: 6px 14px; }
 
+/* menu kontekstowe / hamburger */
+popover > contents, popover.menu > contents { background-color: #101728;
+  border: 1px solid alpha(#5CE1E6,.35); border-radius: 12px; padding: 6px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.45); color: #E7EDFF; }
+popover > arrow { background-color: #101728; border: 1px solid alpha(#5CE1E6,.35); }
+popover modelbutton, popover.menu modelbutton { border-radius: 8px; padding: 7px 12px;
+  color: #cdd5ee; min-height: 0; }
+popover modelbutton:hover { background-color: alpha(#5CE1E6,.14); color: #E7EDFF; }
+
+/* dialogi (Adw.MessageDialog / About) w ciemnej palecie */
+window.messagedialog, window.about { background-color: #0C111E; color: #E7EDFF; }
+
+columnview.nova-columns { background: transparent; color: #cdd5ee; }
+columnview.nova-columns > header { background-color: #0C111E; }
+columnview.nova-columns > header button { background: transparent; color: #5b6488;
+  font-size: 11px; font-weight: 700; border: none; box-shadow: none; }
+columnview.nova-columns row:selected { background-color: alpha(#5CE1E6,.12); }
+columnview.nova-columns cell { padding: 7px 10px; }
+
 scrollbar { background: transparent; border: none; }
 scrollbar slider { background-color: alpha(#94B4FF,.20); border-radius: 8px; min-width: 6px; }
 scrollbar slider:hover { background-color: alpha(#94B4FF,.34); }
