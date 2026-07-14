@@ -950,20 +950,25 @@ class NovaWindow(Adw.ApplicationWindow):
         if len(items) != 1:
             return
         f = items[0].gfile.get_path()
+        if not f:
+            return
         argv = find_terminal()
         if not argv:
             self._error("Brak terminala"); return
-        run = (f'cd "$(dirname "{f}")"; if [ -x "{f}" ]; then "{f}"; else sh "{f}"; fi; '
-               f'echo; echo "[koniec — Enter zamyka]"; read _')
+        # nazwa pliku jako argument pozycyjny ($1), NIE wklejana w skrypt —
+        # inaczej plik nazwany np. '; rm -rf ~' wykonałby dowolny kod
+        run = ('f="$1"; cd "$(dirname "$f")" || exit 1; '
+               'if [ -x "$f" ]; then "$f"; else sh "$f"; fi; '
+               'echo; echo "[koniec — Enter zamyka]"; read _')
         base = argv[0]
         if base == "konsole":
-            cmd = ["konsole", "-e", "sh", "-c", run]
+            cmd = ["konsole", "-e", "sh", "-c", run, "explorer", f]
         elif base == "xfce4-terminal":
-            cmd = ["xfce4-terminal", "-x", "sh", "-c", run]
+            cmd = ["xfce4-terminal", "-x", "sh", "-c", run, "explorer", f]
         elif base == "gnome-terminal":
-            cmd = ["gnome-terminal", "--", "sh", "-c", run]
+            cmd = ["gnome-terminal", "--", "sh", "-c", run, "explorer", f]
         else:
-            cmd = [base, "-e", "sh", "-c", run]
+            cmd = [base, "-e", "sh", "-c", run, "explorer", f]
         try:
             Gio.Subprocess.new(cmd, Gio.SubprocessFlags.NONE)
         except GLib.Error as e:
