@@ -1,0 +1,20 @@
+--- thunar/thunar-preferences.c.t34	2026-07-14 08:17:15.379687326 +0000
++++ thunar/thunar-preferences.c	2026-07-14 08:17:15.411687463 +0000
+@@ -426,7 +426,7 @@
+   g_param_spec_boolean ("last-menubar-visible",
+                         "LastMenubarVisible",
+                         NULL,
+-                        TRUE,
++                        FALSE,
+                         EXO_PARAM_READWRITE);
+ 
+   /**
+@@ -671,7 +671,7 @@
+   g_param_spec_string ("last-toolbar-items",
+                        "LastToolbarItems",
+                        NULL,
+-                       "menu:0,back:1,forward:1,open-parent:1,open-home:1,"
++                       "menu:1,back:1,forward:1,open-parent:1,open-home:1,"
+                        "new-tab:0,new-window:0,toggle-split-view:0,"
+                        "undo:1,redo:1,zoom-out:0,zoom-in:0,zoom-reset:0,"
+                        "view-as-icons:1,view-as-detailed-list:1,view-as-compact-list:1,view-switcher:0,"

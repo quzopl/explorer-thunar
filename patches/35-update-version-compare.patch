@@ -1,0 +1,54 @@
+--- thunar/thunar-window.c.t35	2026-07-14 08:17:15.427687531 +0000
++++ thunar/thunar-window.c	2026-07-14 08:17:15.462687681 +0000
+@@ -2033,6 +2033,33 @@
+   gboolean      interactive;
+ } ThunarExplorerUpdateCheck;
+ 
++/* porownanie wersji "vX.Y.Z" po czlonach; >0 gdy a nowsza niz b */
++static gint
++thunar_explorer_version_cmp (const gchar *a,
++                             const gchar *b)
++{
++  gchar **pa;
++  gchar **pb;
++  gint    i;
++  gint    r = 0;
++
++  if (a != NULL && *a == 'v')
++    a++;
++  if (b != NULL && *b == 'v')
++    b++;
++  pa = g_strsplit (a != NULL ? a : "", ".", -1);
++  pb = g_strsplit (b != NULL ? b : "", ".", -1);
++  for (i = 0; r == 0 && (pa[i] != NULL || pb[i] != NULL); i++)
++    {
++      gint64 na = pa[i] != NULL ? g_ascii_strtoll (pa[i], NULL, 10) : 0;
++      gint64 nb = pb[i] != NULL ? g_ascii_strtoll (pb[i], NULL, 10) : 0;
++      r = (na > nb) - (na < nb);
++    }
++  g_strfreev (pa);
++  g_strfreev (pb);
++  return r;
++}
++
+ static void
+ thunar_window_explorer_update_check_done (GObject      *source,
+                                           GAsyncResult *result,
+@@ -2054,7 +2081,7 @@
+       && (end = strchr (p + 1, '"')) != NULL)
+     tag = g_strndup (p + 1, end - p - 1);
+ 
+-  if (tag != NULL && g_strcmp0 (tag, EXPLORER_VERSION) != 0
++  if (tag != NULL && thunar_explorer_version_cmp (tag, EXPLORER_VERSION) > 0
+       && (p = g_getenv ("APPIMAGE")) != NULL && *p != '\0'
+       && g_file_test (p, G_FILE_TEST_IS_REGULAR)
+       && access (p, W_OK) == 0)
+@@ -2062,7 +2089,7 @@
+       /* AppImage z prawem zapisu — pelna samoaktualizacja */
+       thunar_window_explorer_self_update (check->window, tag, p);
+     }
+-  else if (tag != NULL && g_strcmp0 (tag, EXPLORER_VERSION) != 0)
++  else if (tag != NULL && thunar_explorer_version_cmp (tag, EXPLORER_VERSION) > 0)
+     {
+       dialog = gtk_message_dialog_new (GTK_WINDOW (check->window),
+                                        GTK_DIALOG_DESTROY_WITH_PARENT,
