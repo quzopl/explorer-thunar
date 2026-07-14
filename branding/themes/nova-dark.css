@@ -56,6 +56,11 @@ scrollbar slider { background-color: #232D45; border-radius: 6px; min-width: 8px
 scrollbar slider:hover { background-color: #3A4763; }
 
 paned > separator { background-color: #1B2338; }
+.explorer-selbar { background-color: #16333B; border: 1px solid #1B2338;
+  border-radius: 10px; padding: 5px 10px; }
+.explorer-selbar button { background-color: #070A12; border: 1px solid #1B2338;
+  border-radius: 8px; padding: 3px 12px; }
+.explorer-selbar button:hover { background-color: #141B2A; }
 /* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
  * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
 notebook, notebook header { background-color: #070A12; border-color: #1B2338; }
@@ -166,4 +171,7 @@ tooltip.background, tooltip { border-radius: 10px; border: 1px solid #306E78; }
 scrollbar slider { border-radius: 8px; min-width: 6px; }
 progressbar progress { box-shadow: 0 0 8px rgba(92,225,230,.30); }
 levelbar block.filled { box-shadow: 0 0 8px rgba(92,225,230,.30); }
-.sidebar, placessidebar { border-right: 1px solid #1B2338; }
+.sidebar, placessidebar { border: 1px solid #1B2338; border-radius: 14px; }
+.standard-view { border: 1px solid #1B2338; border-radius: 14px; }
+paned > separator { min-width: 10px; background-color: #070A12; }
+statusbar, .statusbar { border: none; }

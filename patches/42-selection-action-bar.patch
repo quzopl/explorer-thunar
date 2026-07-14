@@ -1,0 +1,114 @@
+--- thunar/thunar-window.c.t42	2026-07-14 18:09:56.912287822 +0000
++++ thunar/thunar-window.c	2026-07-14 18:09:56.899287774 +0000
+@@ -414,6 +414,8 @@
+ static void
+ thunar_window_explorer_nova_layout (ThunarWindow *window);
+ static void
++thunar_window_explorer_selbar_update (ThunarWindow *window);
++static void
+ thunar_window_explorer_theme_prop_changed (XfconfChannel *channel,
+                                            const gchar   *property,
+                                            const GValue  *value,
+@@ -636,6 +638,9 @@
+   GtkWidget *location_toolbar_item_view_switcher;
+   GtkWidget *location_toolbar_item_search;
+   GtkWidget *explorer_search_entry;
++  GtkWidget *explorer_selbar;
++  GtkWidget *explorer_selbar_label;
++  GtkWidget *explorer_selbar_menu;
+ 
+   ThunarActionManager *action_mgr;
+ 
+@@ -1310,6 +1315,56 @@
+                     G_CALLBACK (thunar_window_trash_infobar_clicked),
+                     G_OBJECT (window));
+ 
++  /* Explorer: pasek akcji zaznaczenia (jak "Zaznaczono: N" w NOVA) */
++  {
++    GtkWidget *selbox;
++    GtkWidget *button;
++    GtkWidget *item;
++
++    window->explorer_selbar_menu = gtk_menu_new ();
++    g_object_ref_sink (window->explorer_selbar_menu);
++
++    selbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
++    gtk_style_context_add_class (gtk_widget_get_style_context (selbox), "explorer-selbar");
++    gtk_widget_set_margin_start (selbox, 8);
++    gtk_widget_set_margin_end (selbox, 8);
++    gtk_widget_set_margin_bottom (selbox, 6);
++
++    window->explorer_selbar_label = gtk_label_new ("");
++    gtk_label_set_xalign (GTK_LABEL (window->explorer_selbar_label), 0.0f);
++    gtk_box_pack_start (GTK_BOX (selbox), window->explorer_selbar_label, TRUE, TRUE, 4);
++
++    {
++      /* pack_end: ostatni trafia najbardziej w prawo — kolejnosc jak w NOVA */
++      static const ThunarActionManagerAction selbar_actions[] = {
++        THUNAR_ACTION_MANAGER_ACTION_MOVE_TO_TRASH,
++        THUNAR_ACTION_MANAGER_ACTION_CUT,
++        THUNAR_ACTION_MANAGER_ACTION_COPY,
++      };
++      static const gchar *selbar_labels[] = { N_ ("Delete"), N_ ("Cut"), N_ ("Copy") };
++      guint i;
++
++      for (i = 0; i < G_N_ELEMENTS (selbar_actions); i++)
++        {
++          item = thunar_action_manager_append_menu_item (window->action_mgr,
++                                                         GTK_MENU_SHELL (window->explorer_selbar_menu),
++                                                         selbar_actions[i], TRUE);
++          button = gtk_button_new_with_label (_(selbar_labels[i]));
++          g_signal_connect_swapped (button, "clicked",
++                                    G_CALLBACK (gtk_menu_item_activate), item);
++          gtk_box_pack_end (GTK_BOX (selbox), button, FALSE, FALSE, 0);
++        }
++    }
++
++    window->explorer_selbar = gtk_revealer_new ();
++    gtk_revealer_set_transition_type (GTK_REVEALER (window->explorer_selbar),
++                                      GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
++    gtk_container_add (GTK_CONTAINER (window->explorer_selbar), selbox);
++    gtk_widget_show_all (window->explorer_selbar);
++    gtk_revealer_set_reveal_child (GTK_REVEALER (window->explorer_selbar), FALSE);
++    gtk_grid_attach (GTK_GRID (window->view_box), window->explorer_selbar, 0, 2, 1, 1);
++  }
++
+   /* setup a new statusbar */
+   event_box = gtk_event_box_new ();
+   window->statusbar = thunar_statusbar_new ();
+@@ -6638,8 +6693,35 @@
+  * update the image previews.
+  **/
+ static void
++thunar_window_explorer_selbar_update (ThunarWindow *window)
++{
++  GList *files = NULL;
++  guint  n;
++
++  if (window->explorer_selbar == NULL)
++    return;
++
++  if (window->view != NULL)
++    g_object_get (G_OBJECT (window->view), "selected-files", &files, NULL);
++  n = g_list_length (files);
++  thunar_g_list_free_full (files);
++
++  if (n > 0)
++    {
++      gchar *text = g_strdup_printf (_("Selected: %u"), n);
++      gtk_label_set_text (GTK_LABEL (window->explorer_selbar_label), text);
++      g_free (text);
++    }
++  gtk_revealer_set_reveal_child (GTK_REVEALER (window->explorer_selbar), n > 0);
++}
++
++
++
++static void
+ thunar_window_selection_changed (ThunarWindow *window)
+ {
++  thunar_window_explorer_selbar_update (window);
++
+   GList   *selected_files = thunar_view_get_selected_files (THUNAR_VIEW (window->view));
+   gboolean last_image_preview_visible;
+ 

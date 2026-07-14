@@ -155,6 +155,11 @@ scrollbar slider {{ background-color: {scroll}; border-radius: 6px; min-width: 8
 scrollbar slider:hover {{ background-color: {scroll_hover}; }}
 
 paned > separator {{ background-color: {border}; }}
+.explorer-selbar {{ background-color: {sel_bg}; border: 1px solid {border};
+  border-radius: 10px; padding: 5px 10px; }}
+.explorer-selbar button {{ background-color: {toolbar}; border: 1px solid {border};
+  border-radius: 8px; padding: 3px 12px; }}
+.explorer-selbar button:hover {{ background-color: {hover}; }}
 /* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
  * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
 notebook, notebook header {{ background-color: {toolbar}; border-color: {border}; }}
@@ -271,7 +276,10 @@ tooltip.background, tooltip {{ border-radius: 10px; border: 1px solid {sel_borde
 scrollbar slider {{ border-radius: 8px; min-width: 6px; }}
 progressbar progress {{ box-shadow: 0 0 8px {glow}; }}
 levelbar block.filled {{ box-shadow: 0 0 8px {glow}; }}
-.sidebar, placessidebar {{ border-right: 1px solid {border}; }}
+.sidebar, placessidebar {{ border: 1px solid {border}; border-radius: 14px; }}
+.standard-view {{ border: 1px solid {border}; border-radius: 14px; }}
+paned > separator {{ min-width: 10px; background-color: {toolbar}; }}
+statusbar, .statusbar {{ border: none; }}
 """
 
 

@@ -1,0 +1,30 @@
+--- thunar/thunar-shortcuts-view.c.t43	2026-07-14 18:12:33.145902354 +0000
++++ thunar/thunar-shortcuts-view.c	2026-07-14 18:12:01.619777619 +0000
+@@ -398,10 +398,14 @@
+   if (device != NULL)
+     g_object_unref (device);
+ 
+-  g_object_set (renderer,
+-                "visible", pct >= 0,
+-                "value", pct < 0 ? 0 : pct,
+-                NULL);
++  if (pct >= 0)
++    {
++      gchar *text = g_strdup_printf ("%d%%", pct);
++      g_object_set (renderer, "visible", TRUE, "value", pct, "text", text, NULL);
++      g_free (text);
++    }
++  else
++    g_object_set (renderer, "visible", FALSE, "value", 0, "text", "", NULL);
+ }
+ 
+ 
+@@ -496,7 +500,7 @@
+   /* Explorer: pasek zajetosci przy zamontowanych urzadzeniach (NOVA) */
+   {
+     GtkCellRenderer *usage_renderer = gtk_cell_renderer_progress_new ();
+-    g_object_set (usage_renderer, "text", "", "width", 56, "ypad", 8, NULL);
++    g_object_set (usage_renderer, "width", 88, "ypad", 7, NULL);
+     gtk_tree_view_column_pack_start (column, usage_renderer, FALSE);
+     gtk_tree_view_column_set_cell_data_func (column, usage_renderer,
+                                              thunar_shortcuts_view_explorer_usage_cell,
