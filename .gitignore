@@ -8,3 +8,4 @@ dist/
 AppDir/
 plugins-src/
 explorer-nova/__pycache__/
+explorer-nova/AppDir/
