@@ -1,0 +1,109 @@
+/* NOVA shell — motyw z mockupu "Redesign Explorer Thunar UX" (ciemny) */
+* { font-family: "Space Grotesk", "Segoe UI", "Noto Sans", sans-serif; }
+
+window, .nova-root { background-color: #070A12; color: #E7EDFF; }
+
+/* ——— header ——— */
+.nova-header { background-color: #070A12; padding: 8px 12px; }
+.nova-logo { font-weight: 700; font-size: 15px; color: #E7EDFF; }
+.nova-logo-badge { background-image: linear-gradient(135deg,#5CE1E6,#8B7CFF);
+  border-radius: 8px; color: #06101a; font-weight: 700; padding: 2px 8px; margin-right: 8px; }
+.nova-navbtn { background: transparent; border: none; border-radius: 9px; padding: 6px 9px;
+  color: #8A94B8; }
+.nova-navbtn:hover { background-color: rgba(148,180,255,.08); color: #E7EDFF; }
+
+.nova-crumbs { background-color: #101728; border: 1px solid rgba(148,180,255,.14);
+  border-radius: 11px; padding: 3px 6px; }
+.nova-crumb { background: transparent; border: none; border-radius: 8px; padding: 4px 11px;
+  color: #8A94B8; font-weight: 500; }
+.nova-crumb:hover { background-color: rgba(148,180,255,.08); color: #E7EDFF; }
+.nova-crumb.active { background-color: rgba(92,225,230,.14); color: #E7EDFF; }
+.nova-crumb-sep { color: #45507a; padding: 0 1px; }
+
+.nova-search { background-color: #101728; border: 1px solid rgba(148,180,255,.14);
+  border-radius: 11px; padding: 5px 12px; color: #E7EDFF; }
+.nova-search:focus-within { border-color: #5CE1E6; box-shadow: 0 0 14px rgba(92,225,230,.30); }
+.nova-search entry { background: transparent; border: none; color: #E7EDFF; box-shadow: none; }
+.nova-kbd { background-color: rgba(148,180,255,.10); border-radius: 6px; color: #8A94B8;
+  padding: 1px 6px; font-size: 11px; }
+
+.nova-seg { background-color: #101728; border: 1px solid rgba(148,180,255,.14);
+  border-radius: 11px; padding: 3px; }
+.nova-seg button { background: transparent; border: none; border-radius: 8px; padding: 5px 9px;
+  color: #8A94B8; }
+.nova-seg button:hover { background-color: rgba(148,180,255,.08); color: #E7EDFF; }
+.nova-seg button.active { background-color: rgba(92,225,230,.14); color: #5CE1E6; }
+
+.nova-dot { border-radius: 50%; min-width: 13px; min-height: 13px; margin: 0 4px; }
+.nova-dot.min { background-color: #2b3552; }
+.nova-dot.max { background-color: #2b3552; }
+.nova-dot.close { background-color: #F45C7F; }
+.nova-dot:hover { box-shadow: 0 0 8px rgba(92,225,230,.4); }
+
+/* ——— sidebar ——— */
+.nova-sidebar { background-color: #0C111E; border: 1px solid rgba(148,180,255,.10);
+  border-radius: 16px; padding: 10px; margin: 0 0 12px 12px; }
+.nova-section { color: #5b6488; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  padding: 12px 8px 4px 8px; }
+.nova-section-ai { background-image: linear-gradient(90deg,#5CE1E6,#8B7CFF);
+  border-radius: 6px; color: #06101a; padding: 0 6px; margin-left: 6px; font-size: 9px; }
+list.nova-list { background: transparent; }
+.nova-row { background: transparent; border-radius: 10px; padding: 9px 10px; color: #cdd5ee; }
+.nova-row:hover { background-color: rgba(148,180,255,.08); }
+.nova-row:selected, .nova-row.active { background-color: rgba(92,225,230,.10);
+  border: 1px solid rgba(92,225,230,.45); color: #E7EDFF; }
+.nova-row-icon { color: #8A94B8; margin-right: 10px; }
+.nova-row.active .nova-row-icon { color: #5CE1E6; }
+.nova-count { color: #5b6488; font-size: 12px; }
+.nova-dot-c { min-width: 8px; min-height: 8px; border-radius: 50%; margin-right: 10px; }
+
+/* karty urządzeń */
+.nova-devcard { background-color: #101728; border: 1px solid rgba(148,180,255,.10);
+  border-radius: 12px; padding: 10px 11px; margin: 4px 2px; }
+.nova-dev-name { color: #E7EDFF; font-weight: 600; }
+.nova-dev-pct { color: #8A94B8; font-size: 12px; }
+.nova-dev-sub { color: #5b6488; font-size: 11px; }
+levelbar trough { background-color: #0a0f1c; border: none; border-radius: 4px; min-height: 6px; }
+levelbar block.filled { border-radius: 4px; }
+levelbar.acc block.filled { background-image: linear-gradient(90deg,#5CE1E6,#8B7CFF); }
+
+.nova-map { min-height: 10px; border-radius: 5px; }
+
+/* ——— content ——— */
+.nova-content { background-color: #070A12; }
+.nova-toolbar-sel { background-color: rgba(92,225,230,.08);
+  border: 1px solid rgba(92,225,230,.30); border-radius: 12px; padding: 8px 14px; margin: 6px 10px; }
+.nova-pillbtn { background-color: #101728; border: 1px solid rgba(148,180,255,.14);
+  border-radius: 9px; padding: 6px 14px; color: #E7EDFF; }
+.nova-pillbtn:hover { background-color: rgba(148,180,255,.10); }
+.nova-pillbtn.primary { background-image: linear-gradient(135deg,#5CE1E6,#8B7CFF);
+  color: #06101a; border: none; font-weight: 600; }
+
+flowbox.nova-grid { background: transparent; }
+.nova-tile { background-color: #0C111E; border: 1px solid rgba(148,180,255,.10);
+  border-radius: 14px; padding: 14px 10px; margin: 6px; }
+.nova-tile:hover { border-color: rgba(148,180,255,.28); background-color: #101728; }
+flowboxchild:selected .nova-tile { border-color: rgba(92,225,230,.55);
+  background-color: rgba(92,225,230,.08); box-shadow: 0 0 18px rgba(92,225,230,.14); }
+.nova-tile-thumb { border-radius: 10px; min-height: 74px; }
+.nova-tile-name { color: #E7EDFF; font-size: 13px; }
+.nova-tile-sub { color: #5b6488; font-size: 11px; }
+
+/* ——— preview ——— */
+.nova-preview { background-color: #0C111E; border: 1px solid rgba(148,180,255,.10);
+  border-radius: 16px; padding: 14px; margin: 0 12px 12px 0; }
+.nova-prev-title { color: #E7EDFF; font-weight: 600; font-size: 15px; }
+.nova-prev-k { color: #5b6488; font-size: 12px; }
+.nova-prev-v { color: #cdd5ee; font-size: 12px; }
+.nova-prev-thumb { border-radius: 12px; min-height: 150px;
+  background-image: radial-gradient(120% 120% at 20% 0%, rgba(92,225,230,.18), #101728); }
+
+/* ——— statusbar ——— */
+.nova-status { background-color: #070A12; color: #5b6488; font-size: 12px; padding: 6px 14px;
+  border-top: 1px solid rgba(148,180,255,.08); }
+.nova-status .ok { color: #34D399; }
+
+scrollbar { background: transparent; border: none; }
+scrollbar slider { background-color: rgba(148,180,255,.20); border-radius: 8px; min-width: 6px; }
+scrollbar slider:hover { background-color: rgba(148,180,255,.34); }
+tooltip { background-color: #101728; border: 1px solid rgba(92,225,230,.35); border-radius: 10px; }

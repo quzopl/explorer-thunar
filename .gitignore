@@ -7,3 +7,4 @@ thunar-src/
 dist/
 AppDir/
 plugins-src/
+explorer-nova/__pycache__/
