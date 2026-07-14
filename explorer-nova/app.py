@@ -14,7 +14,7 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw, Gio, GLib, Gdk, GObject, Pango, GdkPixbuf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 APP_ID = "io.github.quzopl.Explorer"
 
 TINTS = [
