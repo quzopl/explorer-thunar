@@ -125,6 +125,10 @@ export GDK_PIXBUF_MODULE_FILE="$HERE/usr/lib/gdk-pixbuf-2.0/loaders.cache"
 export GSETTINGS_SCHEMA_DIR="$HERE/usr/share/glib-2.0/schemas"
 export XDG_DATA_DIRS="$HERE/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
 export FONTCONFIG_PATH="${FONTCONFIG_PATH:-/etc/fonts}"
+# fallback renderera: GTK4 domyślnie wymaga GL — na maszynach bez akceleracji
+# (zdalne pulpity/ThinLinc, VM, stare GPU) okno by się nie wyrenderowało.
+# Cairo jest wolniejszy, ale zawsze działa; nadpisywalny przez użytkownika.
+export GSK_RENDERER="${GSK_RENDERER:-cairo}"
 # odbuduj cache loaderów pod właściwe ścieżki (raz)
 if [ ! -f "$GDK_PIXBUF_MODULE_FILE" ] && command -v gdk-pixbuf-query-loaders >/dev/null; then
   GDK_PIXBUF_MODULEDIR="$GDK_PIXBUF_MODULEDIR" gdk-pixbuf-query-loaders > "$GDK_PIXBUF_MODULE_FILE" 2>/dev/null || true

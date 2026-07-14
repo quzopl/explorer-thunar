@@ -14,7 +14,7 @@ gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw, Gio, GLib, Gdk, GObject, Pango, GdkPixbuf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-VERSION = "2.0.2"
+VERSION = "2.0.3"
 APP_ID = "io.github.quzopl.Explorer"
 
 TINTS = [
@@ -213,11 +213,13 @@ class NovaWindow(Adw.ApplicationWindow):
         menu_btn.set_menu_model(m)
         h.append(menu_btn)
 
-        dots = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=3)
-        for cls, cb in (("min", lambda *_: self.minimize()),
-                        ("max", self._toggle_max), ("close", lambda *_: self.close())):
-            d = Gtk.Button(); d.add_css_class("nova-dot"); d.add_css_class(cls)
-            d.set_size_request(13, 13); d.connect("clicked", cb); dots.append(d)
+        dots = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=9)
+        dots.set_valign(Gtk.Align.CENTER)
+        dots.set_margin_start(6)
+        for color, hover, cb in (("#3a4668", "#5b6488", lambda *_: self.minimize()),
+                                 ("#3a4668", "#5b6488", self._toggle_max),
+                                 ("#F45C7F", "#F87171", lambda *_: self.close())):
+            dots.append(self._window_dot(color, hover, cb))
         h.append(dots)
         self._install_actions()
         return h
@@ -234,6 +236,33 @@ class NovaWindow(Adw.ApplicationWindow):
 
     def _toggle_max(self, *_):
         self.unmaximize() if self.is_maximized() else self.maximize()
+
+    def _window_dot(self, color, hover, cb):
+        """Okrągły przycisk okna rysowany na DrawingArea (pełna kontrola,
+        bez rozciągania przez motyw)."""
+        area = Gtk.DrawingArea()
+        area.set_size_request(13, 13)
+        area.set_valign(Gtk.Align.CENTER)
+        area.set_halign(Gtk.Align.CENTER)
+        state = {"hover": False}
+        base = Gdk.RGBA(); base.parse(color)
+        hov = Gdk.RGBA(); hov.parse(hover)
+
+        def draw(a, cr, w, h):
+            c = hov if state["hover"] else base
+            cr.set_source_rgba(c.red, c.green, c.blue, 1)
+            cr.arc(w / 2, h / 2, min(w, h) / 2, 0, 6.2832)
+            cr.fill()
+        area.set_draw_func(draw)
+        click = Gtk.GestureClick()
+        click.connect("released", lambda *_: cb())
+        area.add_controller(click)
+        motion = Gtk.EventControllerMotion()
+        motion.connect("enter", lambda *_: (state.update(hover=True), area.queue_draw()))
+        motion.connect("leave", lambda *_: (state.update(hover=False), area.queue_draw()))
+        area.add_controller(motion)
+        area.set_cursor(Gdk.Cursor.new_from_name("pointer"))
+        return area
 
     # ——— sidebar ———
     def _build_sidebar(self):
@@ -460,13 +489,22 @@ class NovaWindow(Adw.ApplicationWindow):
         css.load_from_data((".nova-labeldot{background-color:%s;border-radius:50%%;"
                             "border:2px solid #0C111E;}" % color).encode())
 
-    def _thumbnail(self, gfile):
+    def _thumbnail(self, gfile, size=256):
         try:
             path = gfile.get_path()
             if not path:
                 return None
-            pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, 120, 90, True)
-            return Gdk.Texture.new_for_pixbuf(pb)
+            cache = self.__dict__.setdefault("_thumb_cache", {})
+            key = (path, size)
+            if key in cache:
+                return cache[key]
+            # wczytaj w rozdzielczości docelowej (ostro, bez skalowania w górę)
+            pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, size, size, True)
+            tex = Gdk.Texture.new_for_pixbuf(pb)
+            if len(cache) > 400:
+                cache.clear()
+            cache[key] = tex
+            return tex
         except Exception:
             return None
 
@@ -550,7 +588,7 @@ class NovaWindow(Adw.ApplicationWindow):
         while child:
             nxt = child.get_next_sibling(); self.prev_grid.remove(child); child = nxt
         self.prev_title.set_text(info.get_display_name())
-        tex = self._thumbnail(gfile) if (info.get_content_type() or "").startswith("image/") else None
+        tex = self._thumbnail(gfile, 640) if (info.get_content_type() or "").startswith("image/") else None
         if tex:
             self.prev_pic.set_paintable(tex); self.prev_pic.set_visible(True)
             self.prev_thumb.set_visible(False)
