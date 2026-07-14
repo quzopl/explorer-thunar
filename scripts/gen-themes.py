@@ -237,7 +237,22 @@ headerbar button.titlebutton:backdrop, .titlebar button.titlebutton:backdrop {{
 # pigułkowe kontenery, większe promienie, akcentowe ramki i poświata.
 # Doklejana do palet z tokenem "glow". rgba tylko w box-shadow (bez teł!).
 NOVA_EXTRA = """
-/* ——— warstwa stylu NOVA: pigułki, promienie, poświata ——— */
+/* ——— warstwa stylu NOVA: font, pigułki, promienie, poświata ——— */
+* {{ font-family: "Space Grotesk", "Segoe UI", "Noto Sans", sans-serif; }}
+
+/* przyciski okna jako kropki (traffic lights z mockupu) */
+headerbar button.titlebutton, .titlebar button.titlebutton {{
+  min-width: 13px; min-height: 13px; padding: 0; margin: 0 4px;
+  border-radius: 50%; background-color: {scroll}; border: none; }}
+headerbar button.titlebutton image, .titlebar button.titlebutton image {{
+  opacity: 0; }}
+headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover {{
+  background-color: {scroll_hover}; }}
+headerbar button.titlebutton.close, .titlebar button.titlebutton.close {{
+  background-color: #F45C7F; }}
+headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover {{
+  background-color: #F87171; box-shadow: 0 0 8px {glow}; }}
+
 entry {{ border-radius: 10px; padding: 6px 12px; }}
 entry:focus {{ border-color: {accent}; box-shadow: 0 0 10px {glow}; }}
 button {{ border-radius: 9px; padding: 6px 11px; }}

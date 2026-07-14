@@ -32,6 +32,12 @@ for ICONDIR in "$PREFIX/share/icons/hicolor/scalable/apps" \
 done
 gtk-update-icon-cache -f "${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor" 2>/dev/null || true
 
+# font Space Grotesk (motyw NOVA; licencja OFL w branding/fonts)
+FONTDIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+mkdir -p "$FONTDIR"
+install -m644 branding/fonts/SpaceGrotesk.ttf "$FONTDIR/"
+fc-cache -f "$FONTDIR" 2>/dev/null || true
+
 # „Open Terminal Here": Thunar NIE nadpisuje istniejącego ~/.config/Thunar/uca.xml
 # naszym szablonem, więc starsza konfiguracja użytkownika nadal woła stary
 # `exo-open --launch TerminalEmulator` (pada, gdy exo nie ma terminala) albo

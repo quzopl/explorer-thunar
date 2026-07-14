@@ -42,6 +42,11 @@ sed 's/^Exec=.*/Exec=explorer %F/; s/^Icon=.*/Icon=explorer/' \
 mkdir -p "$AD/usr/share/icons/hicolor/scalable/apps"
 install -m644 branding/explorer.svg "$AD/usr/share/icons/hicolor/scalable/apps/explorer.svg"
 
+# 3f. font Space Grotesk dla motywu NOVA (fontconfig znajdzie go przez
+# XDG_DATA_DIRS=$APPDIR/usr/share ustawiane w hooku)
+mkdir -p "$AD/usr/share/fonts/truetype/nova"
+install -m644 branding/fonts/SpaceGrotesk.ttf "$AD/usr/share/fonts/truetype/nova/"
+
 # 3a. mostek GIO->gvfs: bundlowany libgio szuka modułów w ścieżce swojej
 # dystrybucji (np. /usr/lib/x86_64-linux-gnu/gio/modules), której nie ma na
 # innych distro — wtedy znikają Kosz/Recent/Computer/Network i dyski udisks2.
