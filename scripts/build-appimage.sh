@@ -14,6 +14,9 @@ for t in linuxdeploy appimagetool; do
 done
 export PATH="/tmp:$PATH"
 
+# 0. zbuduj narzędzia ghostfs (userspace), jeśli jeszcze nie zbudowane
+[ -x dist-ghostfs/ghostfs-cli ] || bash scripts/build-ghostfs.sh
+
 # 1. build z prefiksem /usr do AppDir
 # --disable-introspection: bez tego build pada na 'Thunarx-3.0.typelib'
 cd thunar-src
@@ -41,6 +44,15 @@ sed 's/^Exec=.*/Exec=explorer %F/; s/^Icon=.*/Icon=explorer/' \
 # 3. ikona — własna z brandingu (bez zależności od zainstalowanego breeze)
 mkdir -p "$AD/usr/share/icons/hicolor/scalable/apps"
 install -m644 branding/explorer.svg "$AD/usr/share/icons/hicolor/scalable/apps/explorer.svg"
+
+# 3c. narzędzia ghostfs (userspace) + owijki — z dist-ghostfs/ (zbudowane
+# w kroku 0) i branding/ghostfs/; PATH do nich dowiązany w AppRun niżej
+mkdir -p "$AD/usr/bin"
+for b in ghostfs-cli ghostfs ghostfs-snapshot-gui ghostfs-disk-tool; do
+  install -m755 "dist-ghostfs/$b" "$AD/usr/bin/$b"
+done
+install -m755 branding/ghostfs/gf-*.sh "$AD/usr/bin/"
+install -m644 branding/ghostfs/gf-common.sh "$AD/usr/bin/"
 
 # 3f. font Space Grotesk dla motywu NOVA (fontconfig znajdzie go przez
 # XDG_DATA_DIRS=$APPDIR/usr/share ustawiane w hooku)
@@ -73,8 +85,18 @@ install -m755 "$GLD" "$AD/usr/libexec/gio-launch-desktop"
 export LD_LIBRARY_PATH="$AD/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export DEPLOY_GTK_VERSION=3 NO_STRIP=1 OUTPUT=Explorer-x86_64.AppImage
 # faza 1: zależności + hook środowiska GTK (bez pakowania)
+# --executable dla binarek ghostfs: to jest tu jedyny mechanizm domykania
+# zależności (ldd-closure) — linuxdeploy sam dociąga i bundluje wszystkie
+# nieoczywiste biblioteki współdzielone (libfuse3, libcrypto, libgtk-3...)
+# każdej podanej binarki do $AD/usr/lib, tak jak już robi to dla thunara.
+GF_EXE_ARGS=()
+for so in "$AD"/usr/bin/ghostfs "$AD"/usr/bin/ghostfs-cli \
+          "$AD"/usr/bin/ghostfs-snapshot-gui "$AD"/usr/bin/ghostfs-disk-tool; do
+  [ -x "$so" ] && GF_EXE_ARGS+=(--executable "$so")
+done
 linuxdeploy --appdir "$AD" \
   --executable "$AD/usr/bin/thunar" \
+  "${GF_EXE_ARGS[@]}" \
   --desktop-file "$AD/usr/share/applications/explorer.desktop" \
   --icon-file branding/explorer.svg \
   --plugin gtk
@@ -120,6 +142,97 @@ if ! grep -q explorer-uca-setup "$HOOK"; then
   printf 'sh "$APPDIR/usr/bin/explorer-uca-setup.sh" 2>/dev/null || true # akcje UCA\n' >> "$HOOK"
 fi
 
+# akcje ghostfs w uca.xml dla użytkowników AppImage: szablon (uca.xml.in,
+# patch 44) ma je już wbudowane, więc świeżo zasiany plik jest kompletny;
+# ten hook dokłada je idempotentnie istniejącym userom, których uca.xml
+# powstał zanim akcje ghostfs istniały (ta sama logika co Task 4 / Python
+# w scripts/install-branding.sh, tu jako samodzielny skrypt na start AppRun)
+cat > "$AD/usr/bin/explorer-ghostfs-seed.sh" <<'EOGFSEED'
+#!/bin/sh
+# idempotentne zasianie/domigrowanie akcji ghostfs w uca.xml (wołane z AppRun)
+UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
+if [ ! -f "$UCA" ]; then
+  TPL="$APPDIR/usr/etc/xdg/Thunar/uca.xml"
+  [ -f "$TPL" ] || TPL="$APPDIR/etc/xdg/Thunar/uca.xml"
+  [ -f "$TPL" ] || exit 0
+  mkdir -p "$(dirname "$UCA")" && cp "$TPL" "$UCA"
+  exit 0
+fi
+command -v python3 >/dev/null 2>&1 || exit 0
+UCA_FILE="$UCA" python3 - <<'PYEOF'
+import os
+uca = os.environ['UCA_FILE']
+s = open(uca).read()
+out = s
+
+gf_actions = '''  <action>
+    <icon>drive-harddisk</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Zamontuj (FUSE)</name>
+    <command>gf-mount.sh %f</command>
+    <description>Zamontuj kontener ghostfs przez FUSE</description>
+    <startup-notify/>
+    <other-files/>
+  </action>
+  <action>
+    <icon>media-eject</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Odmontuj</name>
+    <command>gf-umount.sh %f</command>
+    <description>Odmontuj wolumen ghostfs</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>document-open-recent</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Snapshoty…</name>
+    <command>gf-snap-gui.sh %f</command>
+    <description>Zarządzaj snapshotami kontenera ghostfs</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>drive-removable-media</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Formatuj / zarządzaj</name>
+    <command>gf-disk.sh %f</command>
+    <description>Formatuj/zarządzaj wolumenem ghostfs (disk-tool)</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>document-open-recent</icon>
+    <patterns>*</patterns>
+    <name>ghostfs: Snapshoty tego wolumenu…</name>
+    <command>gf-snap-vol.sh %f</command>
+    <description>Snapshoty zamontowanego wolumenu ghostfs</description>
+    <directories/>
+  </action>
+  <action>
+    <icon>edit-copy</icon>
+    <patterns>*</patterns>
+    <name>ghostfs: Kopiuj jako reflink</name>
+    <command>gf-reflink.sh %f</command>
+    <description>Klon CoW (reflink) w obrębie wolumenu ghostfs</description>
+    <other-files/>
+    <text-files/>
+    <image-files/>
+    <audio-files/>
+    <video-files/>
+  </action>
+'''
+if '<name>ghostfs: Zamontuj (FUSE)</name>' not in out and '</actions>' in out:
+    out = out.replace('</actions>', gf_actions + '</actions>')
+
+if out != s:
+    import time
+    open('%s.bak.%d' % (uca, time.time()), 'w').write(s)
+    open(uca, 'w').write(out)
+PYEOF
+EOGFSEED
+chmod 755 "$AD/usr/bin/explorer-ghostfs-seed.sh"
+if ! grep -q explorer-ghostfs-seed "$HOOK"; then
+  printf 'sh "$APPDIR/usr/bin/explorer-ghostfs-seed.sh" 2>/dev/null || true # akcje ghostfs w uca.xml\n' >> "$HOOK"
+fi
+
 # RUNPATH modułów wskazuje ścieżki dystrybucji builda (np.
 # /usr/lib/x86_64-linux-gnu/gvfs), których nie ma na innych distro — wtedy
 # dlopen modułu pada po cichu (libgvfscommon nieznajdowalna) i gvfs znika.
@@ -127,10 +240,23 @@ fi
 patchelf --set-rpath '$ORIGIN/../..' "$AD"/usr/lib/gio/modules/*.so
 patchelf --set-rpath '$ORIGIN/..' "$AD"/usr/lib/thunarx-3/*.so
 
+# 4a. PATH do narzędzi ghostfs (i innych binarek w usr/bin) w AppRun.
+# linuxdeploy REGENERUJE AppRun przy każdym wywołaniu (także --output appimage),
+# więc eksport PATH musi trafić do AppRun TUŻ przed pakowaniem, a pakujemy
+# bezpośrednio appimagetoolem (linuxdeploy --output i tak tylko go opakowuje,
+# ale przy okazji nadpisałby AppRun i skasował ten wiersz). $APPDIR ustawia
+# w środowisku runtime AppImage; hook GTK jest nadal source'owany wyżej w AppRun.
+if ! grep -q 'PATH="$APPDIR/usr/bin' "$AD/AppRun"; then
+  sed -i '/^exec /i export PATH="$APPDIR/usr/bin:${PATH:-/usr/bin:/bin}" # narzędzia ghostfs (gf-*.sh, ghostfs-cli, ...)' "$AD/AppRun"
+fi
+
 # faza 2: spakuj AppImage z informacją aktualizacyjną zsync (AppImageUpdate
-# pobiera wtedy tylko różnice między wydaniami z GitHub Releases)
-export LDAI_UPDATE_INFORMATION="gh-releases-zsync|quzopl|explorer-thunar|latest|Explorer-x86_64.AppImage.zsync"
-linuxdeploy --appdir "$AD" --output appimage
+# pobiera wtedy tylko różnice między wydaniami z GitHub Releases). Używamy
+# appimagetoola wprost (nie linuxdeploy --output), żeby nie regenerował AppRun.
+export ARCH=x86_64
+appimagetool -n \
+  -u "gh-releases-zsync|quzopl|explorer-thunar|latest|Explorer-x86_64.AppImage.zsync" \
+  "$AD" Explorer-x86_64.AppImage
 mkdir -p dist && mv -f Explorer-x86_64.AppImage dist/
 mv -f Explorer-x86_64.AppImage.zsync dist/ 2>/dev/null || true
 echo "OK: dist/Explorer-x86_64.AppImage"
