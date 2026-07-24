@@ -18,7 +18,8 @@
 - Wrappers start with `set -eu`. Dialog fallback order: `zenity` → `kdialog` → terminal `read`.
 - Bundled tools are found by bare name via `PATH`; AppRun exports `PATH="$APPDIR/usr/bin:$PATH"`; local build installs wrappers+binaries to `install/bin`.
 - New patch number is **44** (highest existing is 43).
-- Target branch: `master` (1.x line).
+- Target branch: work on `feat/ghostfs-tools`, merge to `master` (1.x line) at the end.
+- **`ghostfs-kernel` is a PRIVATE repo** — building requires access: `GH_TOKEN` (repo scope) or configured git credentials for github.com. `build-ghostfs.sh` uses `GH_TOKEN` if present, else falls back to the user's git credentials, else errors clearly. Documented in README (only users with ghostfs-kernel access can rebuild the AppImage).
 
 ---
 
@@ -64,9 +65,19 @@ SRC="$ROOT/.cache/ghostfs-kernel"
 OUT="$ROOT/dist-ghostfs"
 
 if [ ! -d "$SRC/.git" ]; then
-  git clone https://github.com/quzopl/ghostfs-kernel "$SRC"
+  # ghostfs-kernel jest PRYWATNE — wymaga autoryzacji. Kolejność:
+  # GH_TOKEN (CI/nasz build) -> istniejące poświadczenia git użytkownika.
+  if [ -n "${GH_TOKEN:-}" ]; then
+    git clone "https://x-access-token:${GH_TOKEN}@github.com/quzopl/ghostfs-kernel" "$SRC"
+  elif git clone "https://github.com/quzopl/ghostfs-kernel" "$SRC" 2>/dev/null; then
+    :
+  else
+    echo "BŁĄD: nie udało się sklonować prywatnego ghostfs-kernel." >&2
+    echo "Ustaw GH_TOKEN (repo scope) lub skonfiguruj poświadczenia git dla github.com." >&2
+    exit 1
+  fi
 fi
-git -C "$SRC" fetch --all --quiet || true
+git -C "$SRC" fetch --all --quiet 2>/dev/null || true
 git -C "$SRC" checkout --quiet "$PIN"
 
 make -C "$SRC" cli
