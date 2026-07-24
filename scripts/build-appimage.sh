@@ -214,7 +214,12 @@ gf_actions = '''  <action>
     <video-files/>
   </action>
 '''
-if '<name>ghostfs: Mount (FUSE)</name>' not in out and '</actions>' in out:
+import re
+# usuń istniejące akcje ghostfs (PL lub EN) rozpoznane po komendzie gf-*.sh,
+# potem wstaw aktualny angielski zestaw — zapobiega duplikatom po migracji z v1.3.x
+out = re.sub(r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?',
+             '', out, flags=re.S)
+if '</actions>' in out:
     out = out.replace('</actions>', gf_actions + '</actions>')
 
 if out != s:
