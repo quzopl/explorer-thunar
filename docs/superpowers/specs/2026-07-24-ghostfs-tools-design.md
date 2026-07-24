@@ -85,7 +85,8 @@ powłoki) — zgodnie z lekcją bezpieczeństwa z 2.x (command injection).
 
 1. `build-ghostfs.sh` → binarki w `dist-ghostfs/`.
 2. `ghostfs-cli format2 t.gfs 16384`; FUSE-mount przez `gf-mount.sh`; utwórz plik.
-3. `gf-snap-create.sh` / `ghostfs-cli snapshot` → `subvol-list` pokazuje snapshot; `subvol-del` usuwa.
+3. `ghostfs-cli snapshot` (offline) → `subvol-list` pokazuje snapshot; `subvol-del` usuwa. Guard
+   `gf-snap-vol.sh` weryfikowany osobno na zamontowanym i niezamontowanym punkcie.
 4. `gf-reflink.sh` na pliku → kopia istnieje; `ghostfs-cli df` potwierdza brak podwojenia miejsca.
 5. Zrzut menu kontekstowego Thunara z pozycjami „ghostfs: …" (Xvfb).
 
