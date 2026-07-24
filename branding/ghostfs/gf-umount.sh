@@ -10,6 +10,6 @@ if findmnt -no TARGET "$mp" >/dev/null 2>&1; then
   rmdir "$mp" 2>/dev/null || true
   gf_info "Odmontowano $name."
 else
-  gf_err "Kontener nie jest zamontowany."
+  gf_err "The container is not mounted."
   exit 1
 fi

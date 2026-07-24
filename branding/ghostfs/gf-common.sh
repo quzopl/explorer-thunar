@@ -21,7 +21,7 @@ gf_entry() { # $1=tytuł $2=domyślne -> stdout wpisany tekst (pusty = anulowano
 
 gf_need() { # $1=narzędzie $2=podpowiedź
   gf_have "$1" && return 0
-  gf_err "Brak narzędzia '$1'. $2"
+  gf_err "Missing tool '$1'. $2"
   exit 1
 }
 

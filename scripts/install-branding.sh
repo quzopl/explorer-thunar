@@ -32,12 +32,6 @@ for ICONDIR in "$PREFIX/share/icons/hicolor/scalable/apps" \
 done
 gtk-update-icon-cache -f "${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor" 2>/dev/null || true
 
-# font Space Grotesk (motyw NOVA; licencja OFL w branding/fonts)
-FONTDIR="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
-mkdir -p "$FONTDIR"
-install -m644 branding/fonts/SpaceGrotesk.ttf "$FONTDIR/"
-fc-cache -f "$FONTDIR" 2>/dev/null || true
-
 # narzędzia ghostfs: owijki + (jeśli zbudowane) binarki userspace do install/bin
 mkdir -p "$PREFIX/bin"
 install -m755 branding/ghostfs/gf-*.sh "$PREFIX/bin/" 2>/dev/null || true
@@ -96,50 +90,50 @@ if '<name>Open in Terminal</name>' not in out and '</actions>' in out:
 gf_actions = '''  <action>
     <icon>drive-harddisk</icon>
     <patterns>*.gfs</patterns>
-    <name>ghostfs: Zamontuj (FUSE)</name>
+    <name>ghostfs: Mount (FUSE)</name>
     <command>gf-mount.sh %f</command>
-    <description>Zamontuj kontener ghostfs przez FUSE</description>
+    <description>Mount a ghostfs container via FUSE</description>
     <startup-notify/>
     <other-files/>
   </action>
   <action>
     <icon>media-eject</icon>
     <patterns>*.gfs</patterns>
-    <name>ghostfs: Odmontuj</name>
+    <name>ghostfs: Unmount</name>
     <command>gf-umount.sh %f</command>
-    <description>Odmontuj wolumen ghostfs</description>
+    <description>Unmount the ghostfs volume</description>
     <other-files/>
   </action>
   <action>
     <icon>document-open-recent</icon>
     <patterns>*.gfs</patterns>
-    <name>ghostfs: Snapshoty…</name>
+    <name>ghostfs: Snapshots…</name>
     <command>gf-snap-gui.sh %f</command>
-    <description>Zarządzaj snapshotami kontenera ghostfs</description>
+    <description>Manage snapshots of the ghostfs container</description>
     <other-files/>
   </action>
   <action>
     <icon>drive-removable-media</icon>
     <patterns>*.gfs</patterns>
-    <name>ghostfs: Formatuj / zarządzaj</name>
+    <name>ghostfs: Format / manage</name>
     <command>gf-disk.sh %f</command>
-    <description>Formatuj/zarządzaj wolumenem ghostfs (disk-tool)</description>
+    <description>Format/manage the ghostfs volume (disk-tool)</description>
     <other-files/>
   </action>
   <action>
     <icon>document-open-recent</icon>
     <patterns>*</patterns>
-    <name>ghostfs: Snapshoty tego wolumenu…</name>
+    <name>ghostfs: Snapshots of this volume…</name>
     <command>gf-snap-vol.sh %f</command>
-    <description>Snapshoty zamontowanego wolumenu ghostfs</description>
+    <description>Snapshots of the mounted ghostfs volume</description>
     <directories/>
   </action>
   <action>
     <icon>edit-copy</icon>
     <patterns>*</patterns>
-    <name>ghostfs: Kopiuj jako reflink</name>
+    <name>ghostfs: Copy as reflink</name>
     <command>gf-reflink.sh %f</command>
-    <description>Klon CoW (reflink) w obrębie wolumenu ghostfs</description>
+    <description>CoW clone (reflink) within the ghostfs volume</description>
     <other-files/>
     <text-files/>
     <image-files/>
@@ -147,7 +141,7 @@ gf_actions = '''  <action>
     <video-files/>
   </action>
 '''
-if '<name>ghostfs: Zamontuj (FUSE)</name>' not in out and '</actions>' in out:
+if '<name>ghostfs: Mount (FUSE)</name>' not in out and '</actions>' in out:
     out = out.replace('</actions>', gf_actions + '</actions>')
 
 if out != s:

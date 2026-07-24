@@ -56,11 +56,6 @@ scrollbar slider { background-color: #3f3f42; border-radius: 6px; min-width: 8px
 scrollbar slider:hover { background-color: #525256; }
 
 paned > separator { background-color: #3a3a3c; }
-.explorer-selbar { background-color: rgba(59,130,246,.24); border: 1px solid #3a3a3c;
-  border-radius: 10px; padding: 5px 10px; }
-.explorer-selbar button { background-color: #323234; border: 1px solid #3a3a3c;
-  border-radius: 8px; padding: 3px 12px; }
-.explorer-selbar button:hover { background-color: #2e2e30; }
 /* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
  * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
 notebook, notebook header { background-color: #323234; border-color: #3a3a3c; }

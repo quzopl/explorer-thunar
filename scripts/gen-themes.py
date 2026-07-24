@@ -65,27 +65,6 @@ PALETTES = {
         "statusbar": "#070e1c", "statusbar_text": "#7e93ba",
         "scroll": "#21385f", "scroll_hover": "#2e4d7e",
         "sb_text": "#c8d6f0"}),
-    "nova-dark": ("NOVA · Ciemny", "dark", {
-        # kolory z mockupu NOVA: rgba wstępnie zmieszane do kryjących
-        # (półprzezroczyste tła potrafią zostawiać czarne dziury w GTK);
-        # tokeny glow/sel_border włączają dodatkową warstwę stylu NOVA
-        "toolbar": "#070A12", "content": "#070A12", "sidebar": "#0C111E",
-        "text": "#E7EDFF", "text_dim": "#8A94B8", "header_text": "#8A94B8",
-        "border": "#1B2338", "hover": "#141B2A", "pressed": "#1D2740",
-        "accent": "#5CE1E6", "sel_bg": "#16333B", "crumb_hover": "#161E30",
-        "field": "#101728", "field_border": "#28334F",
-        "statusbar": "#070A12", "statusbar_text": "#8A94B8",
-        "scroll": "#232D45", "scroll_hover": "#3A4763",
-        "sel_border": "#306E78", "glow": "rgba(92,225,230,.30)"}),
-    "nova-light": ("NOVA · Jasny", "light", {
-        "toolbar": "#EDF0F8", "content": "#FFFFFF", "sidebar": "#F4F6FC",
-        "text": "#131933", "text_dim": "#5B6488", "header_text": "#5B6488",
-        "border": "#DEE2E9", "hover": "#F1F2F5", "pressed": "#E8EBF0",
-        "accent": "#0E8C9C", "sel_bg": "#E0F0F2", "crumb_hover": "#ECF6F7",
-        "field": "#FFFFFF", "field_border": "#CDD2E0",
-        "statusbar": "#EDF0F8", "statusbar_text": "#5B6488",
-        "scroll": "#C7CEE2", "scroll_hover": "#A9B3D2",
-        "sel_border": "#93CBD2", "glow": "rgba(14,140,156,.22)"}),
     "cobalt-light": ("Cobalt · Jasny", "light", {
         "toolbar": "#ffffff", "content": "#ffffff", "sidebar": "#0e2a5e",
         "text": "#10213d", "text_dim": "#5b6b86", "header_text": "#2f6fed",
@@ -155,11 +134,6 @@ scrollbar slider {{ background-color: {scroll}; border-radius: 6px; min-width: 8
 scrollbar slider:hover {{ background-color: {scroll_hover}; }}
 
 paned > separator {{ background-color: {border}; }}
-.explorer-selbar {{ background-color: {sel_bg}; border: 1px solid {border};
-  border-radius: 10px; padding: 5px 10px; }}
-.explorer-selbar button {{ background-color: {toolbar}; border: 1px solid {border};
-  border-radius: 8px; padding: 3px 12px; }}
-.explorer-selbar button:hover {{ background-color: {hover}; }}
 /* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
  * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
 notebook, notebook header {{ background-color: {toolbar}; border-color: {border}; }}
@@ -238,51 +212,6 @@ headerbar button.titlebutton:backdrop, .titlebar button.titlebutton:backdrop {{
 """
 
 
-# Warstwa języka wizualnego NOVA (mockup "Redesign Explorer Thunar UX"):
-# pigułkowe kontenery, większe promienie, akcentowe ramki i poświata.
-# Doklejana do palet z tokenem "glow". rgba tylko w box-shadow (bez teł!).
-NOVA_EXTRA = """
-/* ——— warstwa stylu NOVA: font, pigułki, promienie, poświata ——— */
-* {{ font-family: "Space Grotesk", "Segoe UI", "Noto Sans", sans-serif; }}
-
-/* przyciski okna jako kropki (traffic lights z mockupu) */
-headerbar button.titlebutton, .titlebar button.titlebutton {{
-  min-width: 13px; min-height: 13px; padding: 0; margin: 0 4px;
-  border-radius: 50%; background-color: {scroll}; border: none; }}
-headerbar button.titlebutton image, .titlebar button.titlebutton image {{
-  opacity: 0; }}
-headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover {{
-  background-color: {scroll_hover}; }}
-headerbar button.titlebutton.close, .titlebar button.titlebutton.close {{
-  background-color: #F45C7F; }}
-headerbar button.titlebutton.close:hover, .titlebar button.titlebutton.close:hover {{
-  background-color: #F87171; box-shadow: 0 0 8px {glow}; }}
-
-entry {{ border-radius: 10px; padding: 6px 12px; }}
-entry:focus {{ border-color: {accent}; box-shadow: 0 0 10px {glow}; }}
-button {{ border-radius: 9px; padding: 6px 11px; }}
-toolbar button:checked, .toolbar button:checked {{
-  border: 1px solid {sel_border}; box-shadow: 0 0 10px {glow}; }}
-.path-bar {{ background-color: {field}; border: 1px solid {field_border};
-  border-radius: 10px; padding: 1px 5px; }}
-.path-bar button {{ border-radius: 7px; padding: 4px 10px; color: {text_dim}; }}
-.path-bar button:hover {{ color: {text}; }}
-.path-bar button:checked {{ background-color: {sel_bg}; color: {text}; }}
-menu, .menu, .context-menu {{ border: 1px solid {sel_border}; border-radius: 12px; padding: 6px; }}
-menuitem {{ border-radius: 8px; padding: 7px 14px; }}
-.standard-view .view:selected, iconview:selected, iconview .cell:selected {{ border-radius: 10px; }}
-notebook tab {{ border-radius: 8px; padding: 5px 12px; }}
-tooltip.background, tooltip {{ border-radius: 10px; border: 1px solid {sel_border}; }}
-scrollbar slider {{ border-radius: 8px; min-width: 6px; }}
-progressbar progress {{ box-shadow: 0 0 8px {glow}; }}
-levelbar block.filled {{ box-shadow: 0 0 8px {glow}; }}
-.sidebar, placessidebar {{ border: 1px solid {border}; border-radius: 14px; }}
-.standard-view {{ border: 1px solid {border}; border-radius: 14px; }}
-paned > separator {{ min-width: 10px; background-color: {toolbar}; }}
-statusbar, .statusbar {{ border: none; }}
-"""
-
-
 def main():
     here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     out = os.path.join(here, "branding", "themes")
@@ -292,8 +221,6 @@ def main():
         tokens.setdefault("sb_text", p["text"])
         tokens.setdefault("sb_hover", p["hover"])
         css = TEMPLATE.format(label=label, **tokens)
-        if "glow" in p:
-            css += NOVA_EXTRA.format(**tokens)
         with open(os.path.join(out, slug + ".css"), "w") as f:
             f.write(css)
         print("zapisano", slug + ".css")
