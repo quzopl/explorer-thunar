@@ -7,3 +7,6 @@ thunar-src/
 dist/
 AppDir/
 plugins-src/
+.superpowers/
+dist-ghostfs/
+.cache/ghostfs-kernel/
