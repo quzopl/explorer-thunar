@@ -74,6 +74,10 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   `/mnt/*` fstab entries so every disk appears under "Devices".
 - **Isolation:** its own application id `io.github.quzopl.Explorer` and its own Xfconf
   settings channel `explorer`.
+- **ghostfs tools:** right-click a `.gfs` container for **Mount (FUSE)** /
+  **Unmount** / **Snapshots…** / **Format / manage**; right-click a folder on a
+  mounted ghostfs volume for **Snapshots of this volume…**; right-click any
+  file for **Copy as reflink** (CoW clone). See "ghostfs tools" below.
 
 ## Building from scratch
 
@@ -107,6 +111,50 @@ There is no "Connect to Server" dialog (this is Thunar). Install `gvfs gvfs-smb`
 then press **Ctrl+L** and type a URL, e.g. `smb://server/share` or
 `sftp://host/path`; drag the opened folder onto the sidebar to bookmark it. Local
 `/mnt/*` disks: run `sudo bash scripts/enable-gvfs-drives.sh`.
+
+### ghostfs tools
+
+Explorer bundles the [ghostfs](https://github.com/quzopl/ghostfs-kernel)
+userspace tools (`ghostfs-cli`, the `ghostfs` FUSE driver,
+`ghostfs-snapshot-gui`, `ghostfs-disk-tool`) and wires them into the
+right-click menu via a set of small wrapper scripts
+(`branding/ghostfs/gf-*.sh`, installed to `PATH` alongside `explorer`):
+
+- Right-click a **`.gfs` container file**:
+  - **ghostfs: Zamontuj (FUSE)** ("Mount (FUSE)") — mounts it under
+    `~/.local/share/ghostfs-mounts/<name>/` and opens the folder.
+  - **ghostfs: Odmontuj** ("Unmount") — unmounts it.
+  - **ghostfs: Snapshoty…** ("Snapshots…") — opens `ghostfs-snapshot-gui`
+    against the container file directly (works offline, no mount needed).
+  - **ghostfs: Formatuj / zarządzaj** ("Format / manage") — opens
+    `ghostfs-disk-tool` to format or manage the volume.
+- Right-click a **folder on an already-mounted ghostfs volume**:
+  - **ghostfs: Snapshoty tego wolumenu…** ("Snapshots of this volume…") —
+    resolves the mount point and opens `ghostfs-snapshot-gui` on it.
+- Right-click **any file**:
+  - **ghostfs: Kopiuj jako reflink** ("Copy as reflink") — `cp --reflink=always`
+    a copy-on-write clone next to the original.
+
+**Caveats (verified while building this feature):**
+
+- **Kernel-mount ioctl snapshots** (live, on a kernel-mounted ghostfs) need the
+  `ghostfs_km.ko` kernel module installed separately (`insmod ghostfs_km.ko`)
+  and root. **Mounting via FUSE, taking snapshots of an offline container
+  file, and formatting all work without the kernel module.**
+- **Reflink (`Copy as reflink`) requires a kernel-mounted ghostfs.** The
+  bundled FUSE driver, at its pinned commit, does not implement `FICLONE`, so
+  `cp --reflink=always` on a FUSE-mounted ghostfs fails — the wrapper reports
+  a clear error ("Reflink niedostępny — plik nie leży na wolumenie
+  ghostfs/CoW.") instead of silently falling back to a full copy.
+- **Building the AppImage** (`scripts/build-appimage.sh` /
+  `scripts/build-ghostfs.sh`) needs access to the **private**
+  `quzopl/ghostfs-kernel` repository — set `GH_TOKEN` (repo scope) or have git
+  credentials for `github.com` configured; without either, the build fails
+  with a clear message.
+- All four ghostfs binaries and the wrapper scripts are **bundled inside the
+  AppImage** and the AppImage's `AppRun` prepends its `usr/bin` to `PATH`, so
+  the context-menu actions find them with no extra setup on the user's
+  machine.
 
 ### Building the AppImage
 
