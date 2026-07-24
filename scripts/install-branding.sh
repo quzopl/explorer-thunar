@@ -38,6 +38,16 @@ mkdir -p "$FONTDIR"
 install -m644 branding/fonts/SpaceGrotesk.ttf "$FONTDIR/"
 fc-cache -f "$FONTDIR" 2>/dev/null || true
 
+# narzędzia ghostfs: owijki + (jeśli zbudowane) binarki userspace do install/bin
+mkdir -p "$PREFIX/bin"
+install -m755 branding/ghostfs/gf-*.sh "$PREFIX/bin/" 2>/dev/null || true
+install -m644 branding/ghostfs/gf-common.sh "$PREFIX/bin/" 2>/dev/null || true
+if [ -d dist-ghostfs ]; then
+  for b in ghostfs-cli ghostfs ghostfs-snapshot-gui ghostfs-disk-tool; do
+    [ -x "dist-ghostfs/$b" ] && install -m755 "dist-ghostfs/$b" "$PREFIX/bin/"
+  done
+fi
+
 # „Open Terminal Here": Thunar NIE nadpisuje istniejącego ~/.config/Thunar/uca.xml
 # naszym szablonem, więc starsza konfiguracja użytkownika nadal woła stary
 # `exo-open --launch TerminalEmulator` (pada, gdy exo nie ma terminala) albo
@@ -82,6 +92,63 @@ if '<name>Open in Terminal</name>' not in out and '</actions>' in out:
               '    <description>Run the selected file in a terminal window</description>\n'
               '    <startup-notify/>\n    <text-files/>\n    <other-files/>\n  </action>\n\n</actions>' % run_cmd)
     out = out.replace('</actions>', action)
+
+gf_actions = '''  <action>
+    <icon>drive-harddisk</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Zamontuj (FUSE)</name>
+    <command>gf-mount.sh %f</command>
+    <description>Zamontuj kontener ghostfs przez FUSE</description>
+    <startup-notify/>
+    <other-files/>
+  </action>
+  <action>
+    <icon>media-eject</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Odmontuj</name>
+    <command>gf-umount.sh %f</command>
+    <description>Odmontuj wolumen ghostfs</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>document-open-recent</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Snapshoty…</name>
+    <command>gf-snap-gui.sh %f</command>
+    <description>Zarządzaj snapshotami kontenera ghostfs</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>drive-removable-media</icon>
+    <patterns>*.gfs</patterns>
+    <name>ghostfs: Formatuj / zarządzaj</name>
+    <command>gf-disk.sh %f</command>
+    <description>Formatuj/zarządzaj wolumenem ghostfs (disk-tool)</description>
+    <other-files/>
+  </action>
+  <action>
+    <icon>document-open-recent</icon>
+    <patterns>*</patterns>
+    <name>ghostfs: Snapshoty tego wolumenu…</name>
+    <command>gf-snap-vol.sh %f</command>
+    <description>Snapshoty zamontowanego wolumenu ghostfs</description>
+    <directories/>
+  </action>
+  <action>
+    <icon>edit-copy</icon>
+    <patterns>*</patterns>
+    <name>ghostfs: Kopiuj jako reflink</name>
+    <command>gf-reflink.sh %f</command>
+    <description>Klon CoW (reflink) w obrębie wolumenu ghostfs</description>
+    <other-files/>
+    <text-files/>
+    <image-files/>
+    <audio-files/>
+    <video-files/>
+  </action>
+'''
+if '<name>ghostfs: Zamontuj (FUSE)</name>' not in out and '</actions>' in out:
+    out = out.replace('</actions>', gf_actions + '</actions>')
 
 if out != s:
     import time
