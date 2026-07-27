@@ -54,6 +54,11 @@ done
 install -m755 branding/ghostfs/gf-*.sh "$AD/usr/bin/"
 install -m644 branding/ghostfs/gf-common.sh "$AD/usr/bin/"
 
+# 3d. domyślne szablony menu "Create Document" (zasiewane do katalogu XDG
+# użytkownika przez hook przy starcie — patrz explorer-templates-seed.sh niżej)
+mkdir -p "$AD/usr/share/explorer/templates"
+cp -a branding/templates/. "$AD/usr/share/explorer/templates/"
+
 # 3a. mostek GIO->gvfs: bundlowany libgio szuka modułów w ścieżce swojej
 # dystrybucji (np. /usr/lib/x86_64-linux-gnu/gio/modules), której nie ma na
 # innych distro — wtedy znikają Kosz/Recent/Computer/Network i dyski udisks2.
@@ -231,6 +236,51 @@ EOGFSEED
 chmod 755 "$AD/usr/bin/explorer-ghostfs-seed.sh"
 if ! grep -q explorer-ghostfs-seed "$HOOK"; then
   printf 'sh "$APPDIR/usr/bin/explorer-ghostfs-seed.sh" 2>/dev/null || true # akcje ghostfs w uca.xml\n' >> "$HOOK"
+fi
+
+# domyślne szablony "Create Document" dla użytkowników AppImage: bez nich menu
+# jest puste ("brak szablonów w katalogu domowym"). Katalog szablonów jest
+# LOKALIZOWANY (~/Templates, ~/Szablony, ~/Vorlagen...), więc czytamy go z
+# user-dirs.dirs zamiast zaszywać ~/Templates. Zasiewamy tylko pusty katalog.
+cat > "$AD/usr/bin/explorer-templates-seed.sh" <<'EOTPL'
+#!/bin/sh
+# idempotentne zasianie domyślnych szablonów (wołane z AppRun przy starcie)
+SRC="$APPDIR/usr/share/explorer/templates"
+[ -d "$SRC" ] || exit 0
+
+T=""
+if command -v xdg-user-dir >/dev/null 2>&1; then
+  T="$(xdg-user-dir TEMPLATES 2>/dev/null)"
+fi
+if [ -z "$T" ] || [ "$T" = "$HOME" ]; then
+  UD="${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs"
+  if [ -f "$UD" ]; then
+    # bez source'owania pliku (to by wykonało jego zawartość) — sam odczyt
+    T="$(sed -n 's/^[[:space:]]*XDG_TEMPLATES_DIR="\(.*\)"[[:space:]]*$/\1/p' "$UD" | tail -1)"
+    T="$(printf '%s' "$T" | sed "s|^\$HOME|$HOME|")"
+  fi
+fi
+if [ -z "$T" ] || [ "$T" = "$HOME" ]; then
+  T="$HOME/Templates"
+fi
+
+mkdir -p "$T" 2>/dev/null || exit 0
+# katalog niepusty = użytkownik ma własne szablony; nie dotykamy
+[ -z "$(ls -A "$T" 2>/dev/null)" ] || exit 0
+
+for f in "$SRC"/*; do
+  [ -f "$f" ] || continue
+  b="${f##*/}"
+  cp "$f" "$T/$b" 2>/dev/null || continue
+  case "$b" in
+    *.sh) chmod 755 "$T/$b" 2>/dev/null ;;
+    *)    chmod 644 "$T/$b" 2>/dev/null ;;
+  esac
+done
+EOTPL
+chmod 755 "$AD/usr/bin/explorer-templates-seed.sh"
+if ! grep -q explorer-templates-seed "$HOOK"; then
+  printf 'sh "$APPDIR/usr/bin/explorer-templates-seed.sh" 2>/dev/null || true # domyślne szablony\n' >> "$HOOK"
 fi
 
 # RUNPATH modułów wskazuje ścieżki dystrybucji builda (np.

@@ -32,6 +32,26 @@ for ICONDIR in "$PREFIX/share/icons/hicolor/scalable/apps" \
 done
 gtk-update-icon-cache -f "${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor" 2>/dev/null || true
 
+# domyślne szablony menu "Create Document". Katalog szablonów jest LOKALIZOWANY
+# (XDG_TEMPLATES_DIR: ~/Templates, ~/Szablony, ~/Vorlagen...), więc pytamy o niego
+# xdg-user-dir zamiast zaszywać ~/Templates. Zasiewamy TYLKO gdy katalog jest pusty
+# — czyjeś własne szablony zostają nietknięte.
+TPLDIR="$(xdg-user-dir TEMPLATES 2>/dev/null || true)"
+if [ -z "$TPLDIR" ] || [ "$TPLDIR" = "$HOME" ]; then
+  TPLDIR="$HOME/Templates"
+fi
+mkdir -p "$TPLDIR"
+if [ -z "$(ls -A "$TPLDIR" 2>/dev/null)" ]; then
+  for f in branding/templates/*; do
+    b="$(basename "$f")"
+    case "$b" in
+      *.sh) install -m755 "$f" "$TPLDIR/$b" ;;
+      *)    install -m644 "$f" "$TPLDIR/$b" ;;
+    esac
+  done
+  echo "OK: zasiano szablony w $TPLDIR"
+fi
+
 # narzędzia ghostfs: owijki + (jeśli zbudowane) binarki userspace do install/bin
 mkdir -p "$PREFIX/bin"
 install -m755 branding/ghostfs/gf-*.sh "$PREFIX/bin/" 2>/dev/null || true
