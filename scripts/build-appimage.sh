@@ -53,6 +53,7 @@ for b in ghostfs-cli ghostfs ghostfs-snapshot-gui ghostfs-disk-tool; do
 done
 install -m755 branding/ghostfs/gf-*.sh "$AD/usr/bin/"
 install -m644 branding/ghostfs/gf-common.sh "$AD/usr/bin/"
+install -m755 branding/explorer-action.sh "$AD/usr/bin/"
 
 # 3d. domyślne szablony menu "Create Document" (zasiewane do katalogu XDG
 # użytkownika przez hook przy starcie — patrz explorer-templates-seed.sh niżej)
@@ -76,6 +77,7 @@ done
 # directory"). Bundlujemy binarkę i wskazujemy ją przez GIO_LAUNCH_DESKTOP.
 GLD="$(pkg-config --variable=libdir glib-2.0 2>/dev/null || echo /usr/lib/x86_64-linux-gnu)/glib-2.0/gio-launch-desktop"
 [ -f "$GLD" ] || GLD=/usr/libexec/gio-launch-desktop
+[ -f "$GLD" ] || GLD=/usr/lib/gio-launch-desktop # Arch, glib 2.88
 mkdir -p "$AD/usr/libexec"
 install -m755 "$GLD" "$AD/usr/libexec/gio-launch-desktop"
 
@@ -123,12 +125,18 @@ TPL="$APPDIR/usr/etc/xdg/Thunar/uca.xml"
 [ -f "$TPL" ] || TPL="$APPDIR/etc/xdg/Thunar/uca.xml"
 UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
 [ -f "$TPL" ] || exit 0
+# an empty or cut-off uca.xml leaves the context menu with no actions at all,
+# and nothing else repairs it: keep it aside and seed afresh
+if [ -f "$UCA" ] && ! grep -q '</actions>' "$UCA"; then
+  mv "$UCA" "$UCA.broken.$(date +%s)"
+  notify-send -a Explorer -i dialog-warning "Explorer repaired its right-click actions" \
+    "uca.xml was empty or damaged; the old file was kept as $(basename "$UCA").broken.*" 2>/dev/null
+fi
 if [ ! -f "$UCA" ]; then
   mkdir -p "$(dirname "$UCA")" && cp "$TPL" "$UCA"
   exit 0
 fi
 grep -q 'Open in Terminal' "$UCA" && exit 0
-grep -q '</actions>' "$UCA" || exit 0
 BLK="$(mktemp)" || exit 0
 awk '/<action>/{buf="";inA=1} inA{buf=buf $0 "\n"} /<\/action>/{inA=0; if (buf ~ /Open in Terminal/) blk=buf} END{printf "%s", blk}' "$TPL" > "$BLK"
 [ -s "$BLK" ] || { rm -f "$BLK"; exit 0; }
@@ -222,15 +230,83 @@ gf_actions = '''  <action>
 import re
 # usuń istniejące akcje ghostfs (PL lub EN) rozpoznane po komendzie gf-*.sh,
 # potem wstaw aktualny angielski zestaw — zapobiega duplikatom po migracji z v1.3.x
-out = re.sub(r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?',
-             '', out, flags=re.S)
-if '</actions>' in out:
-    out = out.replace('</actions>', gf_actions + '</actions>')
+ex_actions = '''  <action>
+    <icon>edit-copy-path</icon>
+    <patterns>*</patterns>
+    <name>Copy Path</name>
+    <command>explorer-action.sh copy-path %F</command>
+    <description>Copy the full path of the selection to the clipboard</description>
+    <directories/>
+    <audio-files/>
+    <image-files/>
+    <other-files/>
+    <text-files/>
+    <video-files/>
+  </action>
+  <action>
+    <icon>security-high</icon>
+    <patterns>*</patterns>
+    <name>SHA-256 Checksum</name>
+    <command>explorer-action.sh checksum %F</command>
+    <description>Show the SHA-256 checksum and copy it to the clipboard</description>
+    <audio-files/>
+    <image-files/>
+    <other-files/>
+    <text-files/>
+    <video-files/>
+  </action>
+  <action>
+    <icon>document-compare</icon>
+    <patterns>*</patterns>
+    <range>2-2</range>
+    <name>Compare Files</name>
+    <command>explorer-action.sh compare %F</command>
+    <description>Compare the two selected files</description>
+    <other-files/>
+    <text-files/>
+  </action>
+  <action>
+    <icon>kdeconnect</icon>
+    <patterns>*</patterns>
+    <name>Send to Phone</name>
+    <command>explorer-action.sh send-phone %F</command>
+    <description>Send the selection to a phone with KDE Connect</description>
+    <audio-files/>
+    <image-files/>
+    <other-files/>
+    <text-files/>
+    <video-files/>
+  </action>
+'''
 
-if out != s:
+def sync_actions(out, command_re, actions):
+    # actions are matched by their command; the set is replaced only when its
+    # names differ, since Thunar re-saves uca.xml in its own layout (tabs,
+    # unique-id) and a text comparison would rewrite the file on every start
+    one = r'[ \t]*<action>(?:(?!</action>).)*?<command>' + command_re + r'(?:(?!</action>).)*?</action>\n?'
+    names = lambda xml: sorted(re.findall(r'<name>([^<]*)</name>', xml))
+    if names(''.join(re.findall(one, out, flags=re.S))) == names(actions):
+        return out
+    out = re.sub(one, '', out, flags=re.S)
+    return out.replace('</actions>', actions + '</actions>') if '</actions>' in out else out
+
+out = sync_actions(out, r'gf-[^<]*</command>', gf_actions)
+out = sync_actions(out, r'explorer-action\.sh [^<]*</command>', ex_actions)
+
+if out != s and '</actions>' in out:
     import time
     open('%s.bak.%d' % (uca, time.time()), 'w').write(s)
-    open(uca, 'w').write(out)
+    # writing in place truncates first: an interrupted write (full disk, killed
+    # process) left uca.xml empty and the context menu without any actions
+    with open(uca + '.tmp', 'w') as f:
+        f.write(out)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(uca + '.tmp', uca)
+    # one backup per change: keep the five newest
+    import glob
+    for old in sorted(glob.glob(uca + '.bak.[0-9]*'), key=os.path.getmtime)[:-5]:
+        os.remove(old)
 PYEOF
 EOGFSEED
 chmod 755 "$AD/usr/bin/explorer-ghostfs-seed.sh"

@@ -1,0 +1,55 @@
+--- plugins/thunar-uca/uca.xml.in.orig	2026-11-08 21:30:21.349508400 +0100
++++ plugins/thunar-uca/uca.xml.in	2026-11-08 21:30:21.401509500 +0100
+@@ -111,4 +111,52 @@
+     <video-files/>
+   </action>
+ 
++  <action>
++    <icon>edit-copy-path</icon>
++    <patterns>*</patterns>
++    <name>Copy Path</name>
++    <command>explorer-action.sh copy-path %F</command>
++    <description>Copy the full path of the selection to the clipboard</description>
++    <directories/>
++    <audio-files/>
++    <image-files/>
++    <other-files/>
++    <text-files/>
++    <video-files/>
++  </action>
++  <action>
++    <icon>security-high</icon>
++    <patterns>*</patterns>
++    <name>SHA-256 Checksum</name>
++    <command>explorer-action.sh checksum %F</command>
++    <description>Show the SHA-256 checksum and copy it to the clipboard</description>
++    <audio-files/>
++    <image-files/>
++    <other-files/>
++    <text-files/>
++    <video-files/>
++  </action>
++  <action>
++    <icon>document-compare</icon>
++    <patterns>*</patterns>
++    <range>2-2</range>
++    <name>Compare Files</name>
++    <command>explorer-action.sh compare %F</command>
++    <description>Compare the two selected files</description>
++    <other-files/>
++    <text-files/>
++  </action>
++  <action>
++    <icon>kdeconnect</icon>
++    <patterns>*</patterns>
++    <name>Send to Phone</name>
++    <command>explorer-action.sh send-phone %F</command>
++    <description>Send the selection to a phone with KDE Connect</description>
++    <audio-files/>
++    <image-files/>
++    <other-files/>
++    <text-files/>
++    <video-files/>
++  </action>
++
+ </actions>
