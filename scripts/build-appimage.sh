@@ -123,12 +123,16 @@ TPL="$APPDIR/usr/etc/xdg/Thunar/uca.xml"
 [ -f "$TPL" ] || TPL="$APPDIR/etc/xdg/Thunar/uca.xml"
 UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
 [ -f "$TPL" ] || exit 0
+# an empty or cut-off uca.xml leaves the context menu with no actions at all,
+# and nothing else repairs it: keep it aside and seed afresh
+if [ -f "$UCA" ] && ! grep -q '</actions>' "$UCA"; then
+  mv "$UCA" "$UCA.broken.$(date +%s)"
+fi
 if [ ! -f "$UCA" ]; then
   mkdir -p "$(dirname "$UCA")" && cp "$TPL" "$UCA"
   exit 0
 fi
 grep -q 'Open in Terminal' "$UCA" && exit 0
-grep -q '</actions>' "$UCA" || exit 0
 BLK="$(mktemp)" || exit 0
 awk '/<action>/{buf="";inA=1} inA{buf=buf $0 "\n"} /<\/action>/{inA=0; if (buf ~ /Open in Terminal/) blk=buf} END{printf "%s", blk}' "$TPL" > "$BLK"
 [ -s "$BLK" ] || { rm -f "$BLK"; exit 0; }
@@ -222,15 +226,25 @@ gf_actions = '''  <action>
 import re
 # usuń istniejące akcje ghostfs (PL lub EN) rozpoznane po komendzie gf-*.sh,
 # potem wstaw aktualny angielski zestaw — zapobiega duplikatom po migracji z v1.3.x
-out = re.sub(r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?',
-             '', out, flags=re.S)
-if '</actions>' in out:
-    out = out.replace('</actions>', gf_actions + '</actions>')
+gf_re = r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?'
+# Thunar re-saves uca.xml in its own layout (tabs, unique-id), so the text never
+# matches gf_actions: compare by name, or the file is rewritten on every start
+have = sorted(re.search(r'<name>([^<]*)</name>', a).group(1) for a in re.findall(gf_re, out, flags=re.S))
+if have != sorted(re.findall(r'<name>([^<]*)</name>', gf_actions)):
+    out = re.sub(gf_re, '', out, flags=re.S)
+    if '</actions>' in out:
+        out = out.replace('</actions>', gf_actions + '</actions>')
 
-if out != s:
+if out != s and '</actions>' in out:
     import time
     open('%s.bak.%d' % (uca, time.time()), 'w').write(s)
-    open(uca, 'w').write(out)
+    # writing in place truncates first: an interrupted write (full disk, killed
+    # process) left uca.xml empty and the context menu without any actions
+    with open(uca + '.tmp', 'w') as f:
+        f.write(out)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(uca + '.tmp', uca)
 PYEOF
 EOGFSEED
 chmod 755 "$AD/usr/bin/explorer-ghostfs-seed.sh"

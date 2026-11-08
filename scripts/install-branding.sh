@@ -71,6 +71,10 @@ UCA="${XDG_CONFIG_HOME:-$HOME/.config}/Thunar/uca.xml"
 # Bez pliku użytkownika Thunar szuka szablonu w XDG_CONFIG_DIRS (/etc/xdg),
 # a nasz instaluje się do $PREFIX/etc/xdg — niewidoczny. Zasiej go, inaczej
 # menu kontekstowe nie ma ŻADNYCH akcji (w tym "Open Terminal Here").
+# Pusty lub ucięty uca.xml też oznacza menu bez akcji: odłóż go i zasiej od nowa.
+if [ -f "$UCA" ] && ! grep -q '</actions>' "$UCA"; then
+  mv "$UCA" "$UCA.broken.$(date +%s)"
+fi
 if [ ! -f "$UCA" ] && [ -f "$PREFIX/etc/xdg/Thunar/uca.xml" ]; then
   mkdir -p "$(dirname "$UCA")"
   install -m644 "$PREFIX/etc/xdg/Thunar/uca.xml" "$UCA"
@@ -164,15 +168,25 @@ gf_actions = '''  <action>
 import re
 # usuń istniejące akcje ghostfs (PL lub EN) rozpoznane po komendzie gf-*.sh,
 # potem wstaw aktualny angielski zestaw — zapobiega duplikatom po migracji z v1.3.x
-out = re.sub(r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?',
-             '', out, flags=re.S)
-if '</actions>' in out:
-    out = out.replace('</actions>', gf_actions + '</actions>')
+gf_re = r'[ \t]*<action>(?:(?!</action>).)*?<command>gf-[^<]*</command>(?:(?!</action>).)*?</action>\n?'
+# Thunar re-saves uca.xml in its own layout (tabs, unique-id), so the text never
+# matches gf_actions: compare by name, or the file is rewritten on every start
+have = sorted(re.search(r'<name>([^<]*)</name>', a).group(1) for a in re.findall(gf_re, out, flags=re.S))
+if have != sorted(re.findall(r'<name>([^<]*)</name>', gf_actions)):
+    out = re.sub(gf_re, '', out, flags=re.S)
+    if '</actions>' in out:
+        out = out.replace('</actions>', gf_actions + '</actions>')
 
-if out != s:
+if out != s and '</actions>' in out:
     import time
     open('%s.bak.%d' % (uca, time.time()), 'w').write(s)
-    open(uca, 'w').write(out)
+    # writing in place truncates first: an interrupted write (full disk, killed
+    # process) left uca.xml empty and the context menu without any actions
+    with open(uca + '.tmp', 'w') as f:
+        f.write(out)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(uca + '.tmp', uca)
     print('OK: zmigrowano akcję terminala w %s (fallback chain)' % uca)
 PYEOF
 fi
