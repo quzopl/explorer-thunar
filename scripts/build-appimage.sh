@@ -77,6 +77,7 @@ done
 # directory"). Bundlujemy binarkę i wskazujemy ją przez GIO_LAUNCH_DESKTOP.
 GLD="$(pkg-config --variable=libdir glib-2.0 2>/dev/null || echo /usr/lib/x86_64-linux-gnu)/glib-2.0/gio-launch-desktop"
 [ -f "$GLD" ] || GLD=/usr/libexec/gio-launch-desktop
+[ -f "$GLD" ] || GLD=/usr/lib/gio-launch-desktop # Arch, glib 2.88
 mkdir -p "$AD/usr/libexec"
 install -m755 "$GLD" "$AD/usr/libexec/gio-launch-desktop"
 
