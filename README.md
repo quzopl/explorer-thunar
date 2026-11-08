@@ -72,6 +72,13 @@ preview pane** (`Ctrl+4`) — all on a Windows-style Places/Devices sidebar.
   whichever is installed first. Right-click a file → **"Open in Terminal"**
   runs it in a terminal window (scripts without `+x` run via `sh`) and keeps
   the window open with the exit code.
+- **More right-click actions:** "Copy Path", "SHA-256 Checksum" (shown and
+  copied), "Compare Files" for two selected files (`meld`, `kompare` or
+  `kdiff3` when installed, otherwise a diff) and "Send to Phone" (KDE Connect).
+  Clipboard: `wl-copy`, `xclip`, `xsel` or KDE's Klipper.
+- **Right-click actions are self-repairing:** an empty or damaged
+  `~/.config/Thunar/uca.xml` is set aside as `uca.xml.broken.*` and seeded
+  afresh, with a notification; only the five newest `uca.xml.bak.*` are kept.
 - **All drives:** `scripts/enable-gvfs-drives.sh` (sudo) adds `x-gvfs-show` to
   `/mnt/*` fstab entries so every disk appears under "Devices".
 - **Isolation:** its own application id `io.github.quzopl.Explorer` and its own Xfconf
