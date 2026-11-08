@@ -74,7 +74,54 @@ PALETTES = {
         "statusbar": "#0e2a5e", "statusbar_text": "#aebfe0",
         "scroll": "#cdd9ee", "scroll_hover": "#aabfe2",
         "sb_text": "#dbe6fa", "sb_hover": "rgba(255,255,255,.08)"}),
+    # Mica: Windows 11's tinted backdrop behind the title bar and navigation
+    # pane, with the file view as a lighter layer on top of it
+    "mica-dark": ("Mica · Dark", "dark", {
+        "toolbar": "#1e2129", "content": "#262930", "sidebar": "#1e2129",
+        "text": "#f3f4f6", "text_dim": "#a3a8b4", "header_text": "#a3a8b4",
+        "border": "#33363e", "hover": "rgba(255,255,255,.06)", "pressed": "rgba(255,255,255,.09)",
+        "accent": "#60cdff", "sel_bg": "rgba(96,205,255,.17)", "crumb_hover": "rgba(255,255,255,.06)",
+        "field": "#2c2f37", "field_border": "#3a3d46",
+        "statusbar": "#1e2129", "statusbar_text": "#a3a8b4",
+        "scroll": "#4a4e58", "scroll_hover": "#5d626d",
+        "mica": "linear-gradient(160deg, #26293a 0%, #1d2028 50%, #241f2b 100%)"}),
+    "mica-light": ("Mica · Light", "light", {
+        "toolbar": "#edf0f6", "content": "#fbfbfd", "sidebar": "#edf0f6",
+        "text": "#1b1b1f", "text_dim": "#5f6470", "header_text": "#5f6470",
+        "border": "#e1e4ea", "hover": "rgba(0,0,0,.045)", "pressed": "rgba(0,0,0,.07)",
+        "accent": "#005fb8", "sel_bg": "rgba(0,95,184,.11)", "crumb_hover": "rgba(0,0,0,.045)",
+        "field": "#ffffff", "field_border": "#d8dce4",
+        "statusbar": "#edf0f6", "statusbar_text": "#5f6470",
+        "scroll": "#b9bec8", "scroll_hover": "#9aa0ac",
+        "mica": "linear-gradient(160deg, #e9eef8 0%, #eff1f6 45%, #f2eff4 100%)"}),
 }
+
+# Layered on top of TEMPLATE for palettes with a "mica" backdrop.
+MICA = """
+/* Mica: the backdrop gradient shows through the title bar, toolbar, navigation
+ * pane and status bar; the file view sits on it as a lighter, rounded layer */
+toolbar, .toolbar, menubar, statusbar, .statusbar,
+.sidebar, .sidebar .view, .sidebar treeview.view, placessidebar, placessidebar list {{
+  background-color: transparent; background-image: none; border-color: transparent; }}
+/* the CSD title bar is drawn apart from the window body: transparent, it shows
+ * the system theme's light title bar, so it gets the backdrop itself */
+window.background, headerbar, .titlebar, headerbar.titlebar, headerbar:backdrop,
+.titlebar:backdrop, headerbar.titlebar:backdrop {{
+  background-image: {mica}; background-color: {toolbar}; border-color: transparent; }}
+.standard-view {{ background-color: {content}; border: 1px solid {border};
+  border-radius: 8px 8px 0 0; margin: 0 6px 0 0; }}
+treeview.view header button {{ background-color: {content}; }}
+iconview .cell:selected, .standard-view .view:selected {{ border-radius: 4px; }}
+.sidebar .view:selected, .sidebar treeview.view:selected {{
+  background-color: {sel_bg}; color: {text}; border-radius: 4px; }}
+button, entry, menuitem {{ border-radius: 4px; }}
+entry {{ border-bottom-color: {scroll}; }}
+entry:focus {{ border-color: {field_border}; box-shadow: inset 0 -2px {accent}; }}
+menu, .menu, popover.menu, .context-menu {{ border-radius: 8px; padding: 4px; }}
+tooltip.background, tooltip {{ border-radius: 4px; }}
+progressbar progress, levelbar block.filled, scale highlight {{ background-color: {accent}; }}
+statusbar, .statusbar {{ border-top: none; }}
+"""
 
 TEMPLATE = """/* Explorer — motyw {label} (generowane z scripts/gen-themes.py) */
 * {{ font-family: "Segoe UI", "Noto Sans", sans-serif; font-size: 10pt; }}
@@ -221,6 +268,8 @@ def main():
         tokens.setdefault("sb_text", p["text"])
         tokens.setdefault("sb_hover", p["hover"])
         css = TEMPLATE.format(label=label, **tokens)
+        if "mica" in p:
+            css += MICA.format(**tokens)
         with open(os.path.join(out, slug + ".css"), "w") as f:
             f.write(css)
         print("zapisano", slug + ".css")

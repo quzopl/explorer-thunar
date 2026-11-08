@@ -1,0 +1,157 @@
+/* Explorer — motyw Mica · Light (generowane z scripts/gen-themes.py) */
+* { font-family: "Segoe UI", "Noto Sans", sans-serif; font-size: 10pt; }
+
+window, .background, dialog, popover { background-color: #edf0f6; color: #1b1b1f; }
+
+.standard-view, .standard-view .view, .standard-view .view text,
+treeview.view, iconview { background-color: #fbfbfd; color: #1b1b1f; border: none; outline: none; }
+.standard-view .view:hover, treeview.view:hover, iconview:hover { background-color: rgba(0,0,0,.045); }
+.standard-view .view:selected, treeview.view:selected, iconview:selected, iconview .cell:selected {
+  background-color: rgba(0,95,184,.11); color: #1b1b1f; }
+treeview.view header button { background-color: #fbfbfd; color: #5f6470;
+  border: none; border-bottom: 1px solid #e1e4ea; padding: 5px 8px; }
+treeview.view header button:hover { background-color: rgba(0,0,0,.045); }
+
+.sidebar, .sidebar .view, .sidebar treeview.view, placessidebar, placessidebar list {
+  background-color: #edf0f6; color: #1b1b1f; }
+.sidebar .view:hover, .sidebar treeview.view:hover { background-color: rgba(0,0,0,.045); }
+.sidebar label { color: #1b1b1f; }
+
+toolbar, headerbar, .toolbar { background-color: #edf0f6; color: #1b1b1f;
+  border: none; border-bottom: 1px solid #e1e4ea; padding: 4px 6px; }
+
+/* background-image/box-shadow: none — kasuje gradient/cień przycisku z
+ * systemowego motywu GTK (np. Breeze-Dark na KDE), który inaczej przebija
+ * jako ciemny/czarny prostokąt na aktywnym przycisku widoku. */
+button { background-color: transparent; background-image: none; box-shadow: none;
+  color: #1b1b1f; border: none; border-radius: 5px; padding: 5px 10px; }
+button:hover { background-color: rgba(0,0,0,.045); background-image: none; box-shadow: none; }
+button:active, button:checked { background-color: rgba(0,0,0,.07); background-image: none; box-shadow: none; }
+
+/* aktywny przycisk widoku (ikony/szczegóły/kompakt) w pasku narzędzi —
+ * subtelny akcent zamiast brzydkiego ciemnego kwadratu */
+toolbar button:checked, .toolbar button:checked,
+toolbar togglebutton:checked, toolbar button:active {
+  background-color: rgba(0,95,184,.11); background-image: none; box-shadow: none; color: #1b1b1f; }
+toolbar button:checked:hover, .toolbar button:checked:hover { background-color: rgba(0,0,0,.045); }
+
+entry { background-color: #ffffff; color: #1b1b1f; border: 1px solid #d8dce4;
+  border-radius: 5px; padding: 4px 8px; }
+entry:focus { border-color: #005fb8; }
+
+.path-bar button, .location-bar button { background-color: transparent; color: #5f6470; border-radius: 4px; padding: 3px 8px; }
+.path-bar button:hover, .location-bar button:hover { background-color: rgba(0,0,0,.045); color: #1b1b1f; }
+
+menu, .menu, popover.menu, .context-menu { background-color: #edf0f6; color: #1b1b1f; border: 1px solid #e1e4ea; padding: 4px; }
+menuitem { border-radius: 4px; padding: 6px 14px; }
+menuitem:hover, menuitem:selected { background-color: rgba(0,0,0,.045); color: #1b1b1f; }
+menubar { background-color: #edf0f6; color: #1b1b1f; }
+menubar > menuitem:hover { background-color: rgba(0,0,0,.045); }
+separator { background-color: #e1e4ea; min-height: 1px; min-width: 1px; }
+
+statusbar, .statusbar { background-color: #edf0f6; color: #5f6470; border-top: 1px solid #e1e4ea; }
+
+scrollbar { background-color: #edf0f6; border: none; }
+scrollbar slider { background-color: #b9bec8; border-radius: 6px; min-width: 8px; min-height: 30px; }
+scrollbar slider:hover { background-color: #9aa0ac; }
+
+paned > separator { background-color: #e1e4ea; }
+/* zakładki: neutralne tło zamiast koloru statusbara — w jasnych paletach
+ * (np. cobalt-light ze statusbarem granatowym) taby gryzły się z dialogiem */
+notebook, notebook header { background-color: #edf0f6; border-color: #e1e4ea; }
+notebook tab { background-color: transparent; color: #5f6470; padding: 4px 10px;
+  border: none; }
+notebook tab:hover { background-color: rgba(0,0,0,.045); }
+notebook tab:checked { background-color: rgba(0,95,184,.11); color: #1b1b1f; }
+
+/* tooltipy — bez tego tekst dziedziczy kolor z motywu aplikacji, a tło
+ * z motywu systemowego: bywa ciemne na ciemnym */
+tooltip.background, tooltip { background-color: #edf0f6; color: #1b1b1f;
+  border: 1px solid #e1e4ea; border-radius: 5px; }
+tooltip label { color: #1b1b1f; }
+
+/* pasek zajętości dysku (Właściwości dysku -> Usage) */
+levelbar trough { background-color: #ffffff; border: 1px solid #d8dce4;
+  border-radius: 4px; }
+levelbar block.filled { background-color: #005fb8; border-radius: 4px; }
+levelbar block.empty { background-color: transparent; }
+
+/* wnętrza dialogów (Właściwości itd.) — motyw systemowy maluje stronę
+ * notebooka (notebook > stack) własnym kolorem bazowym (np. białym),
+ * a nasze etykiety dziedziczą jasny tekst -> nieczytelne. Kryjemy całość. */
+notebook > stack { background-color: #edf0f6; color: #1b1b1f; }
+frame > border { border-color: #e1e4ea; }
+combobox cellview, combobox label { color: #1b1b1f; }
+textview, textview text { background-color: #ffffff; color: #1b1b1f; }
+
+/* wskaźniki wyboru, suwaki, przełączniki, infobary — bez jawnych reguł
+ * bazowy motyw GTK (np. wymuszone w AppImage Adwaita:dark) przebija
+ * ciemnymi elementami i nieczytelnym tekstem w jasnych paletach */
+check, radio { background-color: #ffffff; background-image: none; box-shadow: none;
+  border: 1px solid #d8dce4; color: #ffffff; min-width: 14px; min-height: 14px; }
+check { border-radius: 3px; }
+radio { border-radius: 50%; }
+check:checked, radio:checked, check:indeterminate {
+  background-color: #005fb8; border-color: #005fb8; color: #ffffff; }
+scale trough { background-color: #ffffff; border: 1px solid #d8dce4;
+  border-radius: 4px; min-height: 6px; }
+scale highlight { background-color: #005fb8; border-radius: 4px; }
+scale slider { background-color: #ffffff; background-image: none; box-shadow: none;
+  border: 1px solid #b9bec8; border-radius: 50%; min-width: 16px; min-height: 16px; }
+scale marks, scale value { color: #5f6470; }
+switch { background-color: #ffffff; background-image: none; border: 1px solid #d8dce4; }
+switch:checked { background-color: #005fb8; border-color: #005fb8; }
+switch slider { background-color: #ffffff; background-image: none; box-shadow: none; }
+spinbutton { background-color: #ffffff; color: #1b1b1f; border: 1px solid #d8dce4; }
+spinbutton button { background-color: transparent; color: #1b1b1f; border: none; }
+infobar, infobar revealer > box, infobar > revealer > box {
+  background-color: rgba(0,0,0,.045); background-image: none; color: #1b1b1f; }
+infobar label { color: #1b1b1f; }
+label.dim-label, .dim-label { color: #5f6470; }
+
+/* dialog postępu kopiowania/przenoszenia — bez tego pasek postępu
+ * dziedziczy wygląd z motywu systemowego i gryzie się z paletą */
+progressbar trough { background-color: #ffffff; border: 1px solid #d8dce4;
+  border-radius: 4px; min-height: 8px; }
+progressbar progress { background-color: #005fb8; border: none; border-radius: 4px; min-height: 8px; }
+
+/* headerbar CSD (belka tytułu po stronie aplikacji, jak w Windows 11).
+ * Selektory z klasą .titlebar i :backdrop muszą być co najmniej tak
+ * specyficzne jak w motywie systemowym (Adwaita/Breeze stylują
+ * ".titlebar:backdrop"), inaczej nieaktywne okno dostaje jasny pas. */
+headerbar, .titlebar, headerbar.titlebar { background-color: #edf0f6;
+  background-image: none; box-shadow: none; color: #1b1b1f; border: none;
+  border-bottom: 1px solid #e1e4ea; min-height: 40px; padding: 2px 6px; }
+headerbar:backdrop, .titlebar:backdrop, headerbar.titlebar:backdrop {
+  background-color: #edf0f6; background-image: none; color: #5f6470; }
+headerbar button.titlebutton, .titlebar button.titlebutton {
+  background-color: transparent; background-image: none; box-shadow: none;
+  color: #1b1b1f; border-radius: 5px; padding: 4px; min-width: 24px; min-height: 24px; }
+headerbar button.titlebutton:hover, .titlebar button.titlebutton:hover {
+  background-color: rgba(0,0,0,.045); }
+headerbar button.titlebutton:backdrop, .titlebar button.titlebutton:backdrop {
+  color: #5f6470; }
+
+/* Mica: the backdrop gradient shows through the title bar, toolbar, navigation
+ * pane and status bar; the file view sits on it as a lighter, rounded layer */
+toolbar, .toolbar, menubar, statusbar, .statusbar,
+.sidebar, .sidebar .view, .sidebar treeview.view, placessidebar, placessidebar list {
+  background-color: transparent; background-image: none; border-color: transparent; }
+/* the CSD title bar is drawn apart from the window body: transparent, it shows
+ * the system theme's light title bar, so it gets the backdrop itself */
+window.background, headerbar, .titlebar, headerbar.titlebar, headerbar:backdrop,
+.titlebar:backdrop, headerbar.titlebar:backdrop {
+  background-image: linear-gradient(160deg, #e9eef8 0%, #eff1f6 45%, #f2eff4 100%); background-color: #edf0f6; border-color: transparent; }
+.standard-view { background-color: #fbfbfd; border: 1px solid #e1e4ea;
+  border-radius: 8px 8px 0 0; margin: 0 6px 0 0; }
+treeview.view header button { background-color: #fbfbfd; }
+iconview .cell:selected, .standard-view .view:selected { border-radius: 4px; }
+.sidebar .view:selected, .sidebar treeview.view:selected {
+  background-color: rgba(0,95,184,.11); color: #1b1b1f; border-radius: 4px; }
+button, entry, menuitem { border-radius: 4px; }
+entry { border-bottom-color: #b9bec8; }
+entry:focus { border-color: #d8dce4; box-shadow: inset 0 -2px #005fb8; }
+menu, .menu, popover.menu, .context-menu { border-radius: 8px; padding: 4px; }
+tooltip.background, tooltip { border-radius: 4px; }
+progressbar progress, levelbar block.filled, scale highlight { background-color: #005fb8; }
+statusbar, .statusbar { border-top: none; }

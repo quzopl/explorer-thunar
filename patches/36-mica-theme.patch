@@ -1,0 +1,10 @@
+--- thunar/thunar-window.c.orig	2026-11-08 21:25:51.511994300 +0100
++++ thunar/thunar-window.c	2026-11-08 21:25:51.520994400 +0100
+@@ -7179,6 +7179,7 @@
+     { "aurora-dark", "Aurora \xc2\xb7 Dark" },    { "aurora-light", "Aurora \xc2\xb7 Light" },
+     { "porcelain-dark", "Porcelain \xc2\xb7 Dark" }, { "porcelain-light", "Porcelain \xc2\xb7 Light" },
+     { "cobalt-dark", "Cobalt \xc2\xb7 Dark" },    { "cobalt-light", "Cobalt \xc2\xb7 Light" },
++    { "mica-dark", "Mica \xc2\xb7 Dark" },        { "mica-light", "Mica \xc2\xb7 Light" },
+   };
+   GtkWidget *item;
+   GtkWidget *submenu;
